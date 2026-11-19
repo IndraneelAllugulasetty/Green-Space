@@ -1,0 +1,121 @@
+# PROJECT GREEN
+## Backend Development – Individual Responsibility Report
+
+### 1. Role Overview
+
+The backend developer is responsible for building the central processing and communication system of Project Green.
+
+The backend acts as the connection between the frontend, geolocation module, GIS module and land-information sources.
+
+Its primary responsibility is to ensure that every operation requested by the user is processed correctly and that information is transferred between the different modules reliably.
+
+### 2. Main Responsibilities
+
+**A. Application Architecture**
+
+- Design the overall backend structure.
+- Establish communication between all project modules.
+- Define how information moves from one module to another.
+- Maintain a clean and organized application structure.
+- Ensure that individual modules can operate independently while remaining compatible.
+
+**B. Photograph Processing and Upload Management**
+
+- Receive photographs submitted by users.
+- Validate uploaded files.
+- Check file type and size.
+- Handle invalid or corrupted uploads.
+- Manage the association between photographs and their location information.
+- Ensure that uploaded photographs are processed correctly.
+
+**C. Request Processing**
+
+When a user submits a photograph, the backend should coordinate the following operations:
+
+1. Receive the photograph and associated location information.
+2. Validate the incoming data.
+3. Send the necessary information to the geolocation/GIS module.
+4. Receive the identified location and parcel information.
+5. Request the relevant land records from the data integration module.
+6. Collect the returned information.
+7. Organize the results into a consistent response.
+8. Send the final result to the frontend.
+
+**D. API Development**
+
+Create the communication endpoints required by the application.
+
+These should support:
+
+- Photograph submission.
+- Location information submission.
+- Geographical identification requests.
+- Land-record retrieval requests.
+- Land information responses.
+- Error and status reporting.
+
+The backend developer must define clear input and output formats so all four members can integrate their work without confusion.
+
+**E. Data Management**
+
+- Maintain the relationship between uploaded photographs and their processing requests.
+- Maintain unique request identifiers.
+- Organize the information returned by different modules.
+- Avoid duplicate processing wherever possible.
+- Maintain retrieval timestamps and source information.
+- Handle incomplete or missing responses.
+
+**F. Security and Reliability**
+
+- Validate all incoming requests.
+- Restrict access to sensitive information.
+- Avoid exposing confidential property information unnecessarily.
+- Handle unexpected failures.
+- Prevent unauthorized file access.
+- Ensure that one failed module does not crash the entire application.
+- Provide meaningful error responses.
+
+**G. Integration Management**
+
+- Establish communication with the frontend.
+- Integrate the GIS module.
+- Integrate the land-data retrieval module.
+- Test the complete request-response workflow.
+- Resolve integration issues with the respective developers.
+
+### 3. Expected Deliverables
+
+- Complete backend application structure.
+- Working photograph upload processing.
+- API endpoints for all major operations.
+- Integration between all four modules.
+- Centralized request processing.
+- Standardized response format.
+- Error handling and validation.
+- Proper documentation of API inputs and outputs.
+- Successful end-to-end application workflow.
+
+### 4. Quality Expectations
+
+The backend must:
+
+- Process requests reliably.
+- Maintain consistency between modules.
+- Handle failures without crashing.
+- Avoid losing important information.
+- Return accurate processing statuses.
+- Support future feature expansion.
+- Keep the application secure and maintainable.
+
+### 5. Coordination With Other Members
+
+- Work with the frontend developer to establish request and response formats.
+- Work with the GIS developer to exchange coordinates and parcel identification results.
+- Work with the data integration developer to retrieve and organize land records.
+- Ensure that all modules follow agreed communication standards.
+
+### 6. Final Goal
+
+Build the central processing system that connects all the individual modules and turns them into one functioning application.
+
+**The backend must ensure that the complete journey from photograph submission to final land information display works reliably.**
