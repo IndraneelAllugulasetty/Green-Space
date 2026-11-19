@@ -1,0 +1,130 @@
+# PROJECT GREEN
+## Land Data Research & Integration – Individual Responsibility Report
+
+### 1. Role Overview
+
+The land data integration developer is responsible for discovering, accessing, processing and organizing the land-related information that Project Green aims to provide.
+
+The objective is to connect identified geographical parcels with relevant land records available through authorized government sources and other legitimate data services.
+
+This module is responsible for turning a parcel identifier or survey number into meaningful property-related information.
+
+### 2. Main Responsibilities
+
+**A. Research Karnataka Land Record Systems**
+
+Conduct detailed research on the availability and structure of Karnataka's land-related information systems.
+
+The research must cover:
+
+- Bhoomi land-record services.
+- RTC (Record of Rights, Tenancy and Crops).
+- Mojini survey and land measurement services.
+- e-Khata and relevant municipal property records.
+- Available cadastral maps and survey information.
+- Other relevant official land-information sources.
+
+Understand what information each source provides, who can access it and under what conditions.
+
+**B. Government Data Accessibility Investigation**
+
+For every potential data source:
+
+- Identify its official portal.
+- Understand the available information.
+- Investigate whether an official API exists.
+- Check whether access requires registration or authorization.
+- Understand usage restrictions and data-sharing conditions.
+- Determine whether automated retrieval is permitted.
+- Identify alternative official data-access methods if direct API integration is unavailable.
+
+Do not assume that every government portal offers an open API or that all property information can be retrieved using only geographical coordinates.
+
+**C. Data Retrieval and Integration**
+
+Once suitable data sources have been identified:
+
+- Develop the process for retrieving relevant land information.
+- Use the parcel identifier or survey number received from the GIS module.
+- Retrieve available records through permitted access methods.
+- Process the returned information.
+- Organize information into a common structure.
+- Handle missing, incomplete and unavailable records.
+- Maintain the source of every retrieved record.
+
+**D. Land Information Classification**
+
+Identify and organize the information that Project Green should display.
+
+Potential categories include:
+
+1. Survey number.
+2. Owner details as officially accessible.
+3. RTC information.
+4. Land classification.
+5. Village and administrative details.
+6. Extent of land.
+7. Available registration-related information.
+8. Available property account information.
+9. Record retrieval date and source.
+
+Investigate which fields are genuinely available from each source. Do not assume that one source provides every field.
+
+**E. Data Validation and Reliability**
+
+- Check whether retrieved information corresponds to the requested survey number.
+- Identify incomplete or inconsistent records.
+- Record the date on which information was retrieved.
+- Distinguish between current and historical records where possible.
+- Avoid presenting unverified information as official.
+- Maintain references to the original source.
+- Document any access restrictions or data limitations.
+
+**F. Fallback and Alternative Data Strategy**
+
+Government data accessibility may become a major challenge.
+
+Therefore, investigate alternative legitimate approaches:
+
+- Publicly available sample land records.
+- Officially published datasets.
+- Authorized downloadable cadastral information.
+- Manually supplied survey numbers for initial demonstrations.
+- Sample property records for testing the application.
+
+The objective is to ensure that the project can demonstrate its complete workflow even if a particular government integration is unavailable.
+
+### 3. Expected Deliverables
+
+- Detailed research report on Karnataka land-information sources.
+- Documentation of available government data and access conditions.
+- Identification of usable APIs or authorized retrieval methods.
+- A working land-record retrieval module for at least one suitable source.
+- Structured land-information output.
+- Data validation and error-handling mechanisms.
+- Sample records for integration and testing.
+- Documentation of unavailable data fields and limitations.
+
+### 4. Quality Expectations
+
+The data integration module must:
+
+- Prefer official and authorized information sources.
+- Never invent or assume property records.
+- Preserve the source of retrieved information.
+- Identify unavailable or restricted information.
+- Distinguish retrieved information from user-provided information.
+- Avoid presenting outdated records as current.
+- Maintain consistency between survey identifiers and retrieved records.
+
+### 5. Coordination With Other Members
+
+- Coordinate with the GIS developer to receive survey numbers and parcel identifiers.
+- Coordinate with the backend developer to define data retrieval requests and response formats.
+- Coordinate with the frontend developer to determine how information should be organized and displayed.
+
+### 6. Final Goal
+
+Develop a reliable information retrieval system that connects identified land parcels with relevant, legally accessible property records.
+
+**The success of this module will determine how much meaningful and trustworthy land information Project Green can actually provide.**
