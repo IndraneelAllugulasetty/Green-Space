@@ -1,0 +1,100 @@
+# PROJECT GREEN
+## Frontend Development – Individual Responsibility Report
+
+### 1. Role Overview
+
+The frontend developer is responsible for creating the complete user-facing application of Project Green.
+
+The objective is to build an interface through which users can easily capture land photographs, view their geographical locations, explore identified land parcels, and understand the information retrieved by the system.
+
+The application must be simple enough for an ordinary person to use, even without technical knowledge.
+
+### 2. Main Responsibilities
+
+**A. Homepage and Application Design**
+
+- Create a professional homepage introducing Project Green.
+- Clearly explain the purpose and functionality of the platform.
+- Provide an intuitive navigation system.
+- Design a clean and consistent interface.
+- Ensure the application is accessible and easy to understand.
+
+**B. Photograph Capture and Upload Interface**
+
+- Provide an option to capture a photograph directly through the application.
+- Allow users to upload existing photographs where appropriate.
+- Request the necessary location permission.
+- Show the captured photograph before submission.
+- Provide options to retake or remove an image.
+- Display upload progress and meaningful error messages.
+- Ensure that the user understands whether location information has been captured successfully.
+
+**C. Location Display**
+
+- Display the captured geographical location.
+- Show latitude and longitude in an understandable format.
+- Display the captured location on an interactive map.
+- Allow users to inspect the approximate position of the land.
+- Clearly distinguish an approximate location from a confirmed land parcel.
+
+**D. Land Information Dashboard**
+
+Create a dedicated dashboard to display information received from the backend.
+
+The dashboard should organize information into meaningful sections:
+
+1. General land information.
+2. Geographical location.
+3. Survey number and parcel identification.
+4. Village, Taluk and District.
+5. Available ownership and RTC information.
+6. Land classification.
+7. Available parcel boundaries.
+8. Data source and last-updated information.
+
+Only display information that has actually been retrieved and verified from an available source.
+
+**E. User Experience and Error Handling**
+
+- Display loading indicators while information is being retrieved.
+- Show clear messages when a parcel cannot be identified.
+- Handle missing or unavailable information gracefully.
+- Avoid displaying empty or misleading fields.
+- Provide an option to retry failed operations.
+- Make the application responsive across mobile phones, tablets and desktops.
+
+### 3. Expected Deliverables
+
+By the end of development, the frontend developer must provide:
+
+- A complete homepage.
+- A working photograph capture and upload interface.
+- A location display section.
+- An interactive map interface.
+- A land information dashboard.
+- Proper loading, success and error states.
+- A responsive and consistent user interface.
+- A fully integrated frontend connected to the backend.
+
+### 4. Quality Expectations
+
+The frontend must:
+
+- Be simple and understandable for ordinary users.
+- Avoid unnecessary complexity.
+- Display information in an organized manner.
+- Never show fabricated land information.
+- Clearly communicate unavailable or uncertain information.
+- Provide a smooth experience from photograph capture to final results.
+
+### 5. Coordination With Other Members
+
+- Coordinate with the backend developer to establish what information the application will receive.
+- Coordinate with the GIS developer to display coordinates, maps and parcel boundaries.
+- Coordinate with the data integration developer to understand the available land information and its structure.
+
+### 6. Final Goal
+
+Deliver a professional, user-friendly application through which a person can capture a land photograph and view the relevant information successfully retrieved by Project Green.
+
+**The final interface should make a technically complex process feel simple to the user.**
