@@ -1,0 +1,109 @@
+# PROJECT GREEN
+## Geolocation & GIS Development – Individual Responsibility Report
+
+### 1. Role Overview
+
+The geolocation and GIS developer is responsible for one of the most important technical components of Project Green: connecting a physical land location to its corresponding geographical representation.
+
+The objective is not simply to extract latitude and longitude from a photograph. The main objective is to determine whether those coordinates can be matched to an actual land parcel using available geographical and cadastral information.
+
+This module forms the geographical foundation of the entire project.
+
+### 2. Main Responsibilities
+
+**A. GPS Coordinate Extraction**
+
+- Develop a process to obtain geographical coordinates associated with captured photographs.
+- Extract latitude and longitude from available photograph metadata when present.
+- Support location capture directly from the user's device.
+- Handle photographs without geographical metadata.
+- Validate whether extracted coordinates are within a reasonable geographical range.
+- Record location accuracy wherever available.
+- Distinguish between image metadata and the device's current location.
+
+**B. Geographical Location Verification**
+
+- Verify whether the coordinates represent a valid geographical position.
+- Identify situations where GPS accuracy is insufficient.
+- Handle incorrect, missing or incomplete coordinates.
+- Provide information about the accuracy of the captured position.
+- Avoid treating approximate GPS coordinates as exact land boundaries.
+
+**C. Interactive Map Integration**
+
+- Display the captured location on an interactive map.
+- Allow users to zoom in and out.
+- Show nearby geographical features where available.
+- Display the location marker clearly.
+- Allow users to visually understand where the photographed land is situated.
+- Support the visualization of available land boundaries.
+
+**D. Land Parcel Identification – Primary Responsibility**
+
+This is the most important task assigned to this module.
+
+The developer must investigate and implement a method to match geographical coordinates with actual land parcels.
+
+Required activities:
+
+1. Research available cadastral maps and land parcel datasets for Karnataka.
+2. Understand how survey numbers and parcel boundaries are represented geographically.
+3. Obtain suitable sample geographical boundary data.
+4. Process the geographical coordinates against available parcel boundaries.
+5. Determine whether a coordinate falls within a particular parcel.
+6. Retrieve the corresponding parcel identifier or survey number when available.
+7. Handle situations where multiple parcels are close together.
+8. Handle cases where no matching parcel is found.
+
+**E. Land Boundary Visualization**
+
+- Display available parcel boundaries on the map.
+- Highlight the identified parcel.
+- Show surrounding parcels when the data permits.
+- Provide visual differentiation between the selected parcel and neighbouring land.
+- Ensure that displayed boundaries come from actual geographical datasets.
+- Clearly indicate when boundary information is approximate or unavailable.
+
+**F. Geographical Data Validation**
+
+- Compare identified locations with available reference information.
+- Test the parcel identification process using known sample locations.
+- Measure how often the system correctly identifies the expected parcel.
+- Investigate errors caused by GPS inaccuracies or incomplete boundary datasets.
+- Document limitations and possible improvements.
+
+### 3. Expected Deliverables
+
+- Working GPS coordinate extraction process.
+- Coordinate validation and accuracy handling.
+- Interactive geographical map.
+- Availability of suitable Karnataka land parcel datasets.
+- Coordinate-to-parcel matching functionality.
+- Survey number or parcel identifier retrieval where supported.
+- Parcel boundary visualization.
+- Test cases demonstrating successful and unsuccessful parcel identification.
+- Documentation explaining the identification process and its limitations.
+
+### 4. Quality Expectations
+
+The GIS module must:
+
+- Never assume that GPS coordinates automatically identify ownership or a survey number.
+- Use actual geographical reference data.
+- Distinguish between a location marker and a confirmed parcel match.
+- Handle inaccurate coordinates.
+- Avoid displaying fabricated parcel boundaries.
+- Provide meaningful results when no parcel can be identified.
+- Maintain geographical accuracy as far as the available data allows.
+
+### 5. Coordination With Other Members
+
+- Coordinate with the frontend developer regarding map display and location information.
+- Coordinate with the backend developer regarding coordinate submission and parcel identification responses.
+- Work with the land-data integration developer to understand which survey identifiers and geographical records are needed for data retrieval.
+
+### 6. Final Goal
+
+Develop a working system that can take geographical coordinates obtained from a land photograph and attempt to identify the corresponding land parcel using reliable spatial datasets.
+
+**The success of this module will determine whether Project Green can move beyond ordinary GPS mapping and provide meaningful land parcel identification.**
