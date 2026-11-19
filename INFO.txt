@@ -1,0 +1,109 @@
+Project Overview
+Project Green is a location-based land information platform designed to make land research simpler, more accessible, and transparent.
+
+The central idea is to allow a user to visit a land parcel, capture a geotagged photograph using a smartphone, and retrieve relevant land-related information using its geographical coordinates (latitude and longitude).
+
+The system aims to connect geographical location data with available government land-record sources and other authorized data services to help users understand more about a property before making land-related decisions.
+
+Instead of manually searching through multiple sources and navigating complicated record systems, users will have a centralized platform to begin their land research.
+
+Our core concept:
+
+A photograph → GPS coordinates → Land parcel identification → Data retrieval → Property information.
+
+2. Why Are We Building Project Green?
+Land-related research can be complicated, especially for people who are unfamiliar with government portals and property-record procedures.
+
+Some of the challenges include:
+- Difficulty identifying the exact land parcel from its physical location.
+- Limited awareness of available government land-record services.
+- Having to visit multiple portals to gather property information.
+- Difficulty understanding survey numbers and geographical boundaries.
+- Challenges in connecting a physical plot of land with its corresponding digital records.
+- Risk of making property decisions without sufficient preliminary information.
+Project Green aims to address these challenges by providing a simpler, location-based starting point for land research.
+3. Our Main Aim
+Our primary aim is to develop a smart platform that connects real-world land locations with digitally accessible property information.
+
+We want to:
+1. Simplify the process of identifying land parcels.
+2. Use geotagged photographs to obtain geographical coordinates.
+3. Connect GPS coordinates with available cadastral maps and land records.
+4. Integrate accessible Karnataka government land-information sources.
+5. Present retrieved information through a simple, understandable interface.
+6. Help people conduct preliminary property research before making decisions.
+
+4. How Will the System Work?
+The proposed system will follow a sequence of operations.
+Step 1: Capturing the Land Photograph
+- The user visits the land parcel.
+- Opens Project Green using a smartphone.
+- Captures a photograph through the application.
+- The application requests location permission and obtains GPS coordinates.
+- The image and its associated location information are sent to the backend.
+Step 2: Extracting Geographical Coordinates
+The system obtains:
+- Latitude
+- Longitude
+- Timestamp
+- Image metadata, where available
+For example:
+Parameter	Sample value
+Latitude	12.2958
+Longitude	76.6394
+Timestamp	Capture time
+Image	Uploaded land photograph
+
+These coordinates help establish the approximate geographical location of the photographed land.
+
+Important: GPS coordinates identify a location, not the legal identity or ownership of a land parcel. The system must match the coordinates against cadastral maps or other authorized parcel data to identify a survey number.
+Step 3: Land Parcel Identification
+This is one of the most important parts of our project.
+
+The geographical coordinates will be processed using GIS (Geographic Information System) techniques.
+
+Our system will attempt to:
+- Locate the user's position on a digital map.
+- Compare the coordinates with available land parcel boundaries.
+- Identify the corresponding parcel, if reliable boundary data is available.
+- Retrieve the associated survey number or parcel identifier.
+If accurate parcel boundaries are unavailable, the system should display the approximate location rather than claim an exact parcel match.
+Step 4: Land Information Retrieval
+Once a parcel is identified, the system will attempt to retrieve relevant information through available data sources.
+
+Our initial research will focus on Karnataka.
+
+Potential information sources include:
+- Bhoomi: RTC and related land-record information.
+- Mojini: Survey and land measurement-related information.
+- e-Khata: Relevant urban property records, where accessible.
+- Government cadastral maps and other authorized GIS datasets.
+We will investigate available APIs, official portals, data-access policies and integration possibilities.
+
+Not all these sources necessarily provide public APIs. Where direct integration is unavailable, we will explore authorized alternatives rather than assume unrestricted access.
+Step 5: Displaying the Information
+The retrieved information will be organized into a user-friendly dashboard.
+
+The proposed dashboard may display:
+Information	Purpose
+Location	Geographical position of land
+Survey number	Parcel identification
+Village / Taluk / District	Administrative location
+RTC details	Available land-record information
+Ownership details	Officially accessible recorded details
+Land classification	Agricultural or other recorded classification
+Parcel boundaries	Available mapped boundaries
+Record status	Source and date of retrieved information
+
+The exact fields will depend on the availability and permissions of the underlying datasets.
+5. Main Objectives and Expected Outcomes
+Objective	Expected outcome
+Geotagged photography	Capture a land image with its location
+GPS extraction	Obtain accurate geographical coordinates
+GIS integration	Map the location against available land parcels
+Government data integration	Retrieve relevant available land records
+Information processing	Organize records into understandable sections
+User-friendly interface	Make land research easier for ordinary users
+Transparency	Show the source and freshness of retrieved information
+
+Our ultimate objective is to develop a working prototype that demonstrates how a physical land location can be connected to digital land information.
