@@ -16,20 +16,43 @@ class SyncService {
    * Resolves a parcel by ID, official ID, or geographic hierarchy.
    * Checks Cache -> Persistent Database -> Freshness Evaluation -> Background Refresh Trigger.
    */
-  async resolveParcel(query) {
-    let parcelId = null;
+  
+async resolveParcel(query) {
+  let parcelId = null;
 
-    if (query.parcelId) {
-      parcelId = query.parcelId;
-    } else if (query.officialId) {
-      const p = this.parcelRepo.findParcelByOfficialId(query.officialId);
-      if (p) parcelId = p.id;
+  if (query.parcelId) {
+    parcelId = query.parcelId;
+
+  } else if (query.officialId) {
+    const p = this.parcelRepo.findParcelByOfficialId(query.officialId);
+
+    if (p) {
+      parcelId = p.id;
     } else {
       const validation = ParcelIdentity.validate(query);
+
       if (validation.isValid) {
         parcelId = ParcelIdentity.buildParcelId(query);
       }
     }
+
+  } else {
+    const validation = ParcelIdentity.validate(query);
+
+    if (validation.isValid) {
+      parcelId = ParcelIdentity.buildParcelId(query);
+    }
+  }
+
+  if (!parcelId) {
+    return {
+      found: false,
+      error: 'Invalid or missing parcel identifiers.'
+    };
+  }
+
+  // Keep the remaining existing implementation unchanged.
+
 
     if (!parcelId) {
       return { found: false, error: 'Invalid or missing parcel identifiers.' };
