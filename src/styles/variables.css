@@ -1,0 +1,43 @@
+/* Design Tokens for Project Green */
+:root {
+  /* Brand Green Colors */
+  --color-brand-primary: #123d2d;
+  --color-brand-secondary: #1d6b49;
+  --color-brand-accent: #2e8b57;
+  --color-brand-light: #e8f3ec;
+  --color-brand-muted: #d7eadb;
+  
+  /* Neutral Palette */
+  --color-bg-main: #f5f7f2;
+  --color-bg-card: #ffffff;
+  --color-bg-subtle: #f9faf8;
+  --color-border: #e2e8e0;
+  --color-border-hover: #b6c4b8;
+  
+  /* Text Colors */
+  --color-text-title: #1a261f;
+  --color-text-body: #404e45;
+  --color-text-muted: #6b7a70;
+  --color-text-subtle: #8e9e93;
+
+  /* Status Colors */
+  --color-success: #1d7c4d;
+  --color-success-bg: #eaf7ef;
+  --color-warning: #b26a00;
+  --color-warning-bg: #fff8eb;
+  --color-danger: #c53030;
+  --color-danger-bg: #fde8e8;
+  --color-info: #1f6feb;
+  --color-info-bg: #edf5ff;
+
+  /* Shadows */
+  --shadow-sm: 0 2px 6px rgba(25, 49, 34, 0.04);
+  --shadow-md: 0 8px 24px rgba(25, 49, 34, 0.07);
+  --shadow-lg: 0 18px 48px rgba(25, 49, 34, 0.1);
+
+  /* Radius */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-full: 9999px;
+}
