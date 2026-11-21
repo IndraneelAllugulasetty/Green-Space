@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Project Green — Shared Land Data Repository & Versioning System</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <header class="header">
+    <div class="header-container">
+      <div class="logo-area">
+        <span class="logo-icon">🌿</span>
+        <div>
+          <h1>Project Green</h1>
+          <p class="subtitle">Shared Cadastral Land Repository & Versioning System</p>
+        </div>
+      </div>
+      <div class="system-status-pills">
+        <span id="pill-db" class="status-pill pill-neutral">DB: Connecting...</span>
+        <span id="pill-cache" class="status-pill pill-neutral">Cache: InMemory</span>
+        <span id="pill-queue" class="status-pill pill-neutral">Worker: Idle</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="main-container">
+    <!-- SEARCH & LOOKUP SECTION -->
+    <section class="card lookup-card">
+      <div class="card-header">
+        <h2>Land Parcel Lookup</h2>
+        <span class="badge badge-info">Multi-User Shared Repository</span>
+      </div>
+      
+      <div class="quick-samples">
+        <span class="quick-label">Quick Test Parcels:</span>
+        <button type="button" class="btn btn-secondary btn-sm" onclick="app.quickLoad('KA-RTC-2026-NID-142-3A')">
+          Karnataka: Nidavanda Sy 142/3A
+        </button>
+        <button type="button" class="btn btn-secondary btn-sm" onclick="app.quickLoad('MH-7-12-PUN-HAV-78-1B')">
+          Maharashtra: Kesnand Sy 78/1B
+        </button>
+      </div>
+
+      <form id="lookup-form" class="lookup-grid" onsubmit="app.handleLookup(event)">
+        <div class="form-group col-12">
+          <label for="official-id">Official Cadastral / Land Record ID (Optional)</label>
+          <input type="text" id="official-id" placeholder="e.g. KA-RTC-2026-NID-142-3A or ULPIN" />
+        </div>
+
+        <div class="form-group col-4">
+          <label for="input-state">State *</label>
+          <input type="text" id="input-state" placeholder="e.g. Karnataka" value="Karnataka" required />
+        </div>
+        <div class="form-group col-4">
+          <label for="input-district">District *</label>
+          <input type="text" id="input-district" placeholder="e.g. Bangalore Rural" value="Bangalore Rural" required />
+        </div>
+        <div class="form-group col-4">
+          <label for="input-taluk">Taluk *</label>
+          <input type="text" id="input-taluk" placeholder="e.g. Nelamangala" value="Nelamangala" required />
+        </div>
+
+        <div class="form-group col-4">
+          <label for="input-village">Village *</label>
+          <input type="text" id="input-village" placeholder="e.g. Nidavanda" value="Nidavanda" required />
+        </div>
+        <div class="form-group col-4">
+          <label for="input-survey">Survey Number *</label>
+          <input type="text" id="input-survey" placeholder="e.g. 142" value="142" required />
+        </div>
+        <div class="form-group col-4">
+          <label for="input-hissa">Hissa / Subdivision</label>
+          <input type="text" id="input-hissa" placeholder="e.g. 3A" value="3A" />
+        </div>
+
+        <div class="form-actions col-12">
+          <button type="submit" class="btn btn-primary" id="btn-search">
+            🔍 Check Shared Repository
+          </button>
+        </div>
+      </form>
+    </section>
+
+    <!-- LOADING / SPINNER -->
+    <div id="loading-indicator" class="loading-state hidden">
+      <div class="spinner"></div>
+      <p id="loading-text">Resolving parcel and checking repository cache...</p>
+    </div>
+
+    <!-- ERROR / NOT FOUND ALERT -->
+    <div id="alert-box" class="alert-box hidden"></div>
+
+    <!-- PARCEL DETAIL VIEW -->
+    <section id="parcel-view" class="parcel-view hidden">
+      <!-- FRESHNESS BANNER -->
+      <div id="freshness-banner" class="freshness-banner banner-fresh">
+        <div class="banner-icon" id="banner-icon">✔</div>
+        <div class="banner-content">
+          <div class="banner-title-row">
+            <h3 id="banner-status-text">Verified Record</h3>
+            <span id="badge-version" class="badge badge-version">v1</span>
+            <span id="badge-source-type" class="badge badge-neutral">MOCK_ADAPTER</span>
+          </div>
+          <p id="banner-warning-text" class="banner-warning">Verified with source on recent date.</p>
+        </div>
+        <div class="banner-actions">
+          <button type="button" class="btn btn-warning btn-sm" id="btn-manual-refresh" onclick="app.triggerManualRefresh()">
+            🔄 Request Source Refresh
+          </button>
+        </div>
+      </div>
+
+      <!-- MAIN PARCEL METADATA -->
+      <div class="grid-2-col">
+        <!-- LEFT: LAND DETAILS & OWNERSHIP -->
+        <div class="card">
+          <div class="card-header">
+            <h3>Cadastral Land Record</h3>
+            <span id="parcel-id-label" class="code-label">IN-KA:...</span>
+          </div>
+
+          <div class="details-grid">
+            <div class="detail-item">
+              <span class="detail-label">Survey / Hissa</span>
+              <span class="detail-value" id="val-survey">-</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Official ID</span>
+              <span class="detail-value" id="val-official-id">-</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Hierarchy</span>
+              <span class="detail-value" id="val-hierarchy">-</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Extent / Area</span>
+              <span class="detail-value" id="val-area">-</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Classification</span>
+              <span class="detail-value" id="val-classification">-</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Soil Type</span>
+              <span class="detail-value" id="val-soil">-</span>
+            </div>
+          </div>
+
+          <h4 class="section-title">Owners (RTC Record)</h4>
+          <table class="data-table" id="table-owners">
+            <thead>
+              <tr>
+                <th>Owner Name</th>
+                <th>Relationship</th>
+                <th>Khata No.</th>
+                <th>Share</th>
+                <th>Acquisition</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-owners"></tbody>
+          </table>
+
+          <h4 class="section-title">Liabilities & Bank Charges</h4>
+          <div id="liabilities-container">
+            <p class="text-muted">No encumbrances or charges reported.</p>
+          </div>
+        </div>
+
+        <!-- RIGHT: PROVENANCE, FRESHNESS & TIMESTAMPS -->
+        <div class="card">
+          <div class="card-header">
+            <h3>Data Provenance & Verification</h3>
+            <span id="val-cache-source" class="badge badge-info">DATABASE</span>
+          </div>
+
+          <ul class="provenance-list">
+            <li>
+              <span class="prov-label">Source Authority:</span>
+              <strong id="val-source-name">-</strong>
+            </li>
+            <li>
+              <span class="prov-label">Official Record Effective Date:</span>
+              <span id="val-effective-date">-</span>
+            </li>
+            <li>
+              <span class="prov-label">First Retrieved Date:</span>
+              <span id="val-retrieved-date">-</span>
+            </li>
+            <li>
+              <span class="prov-label">Last Verified Date:</span>
+              <span id="val-verified-date">-</span>
+            </li>
+            <li>
+              <span class="prov-label">Canonical Content Hash (SHA-256):</span>
+              <code id="val-hash" class="hash-box">e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855</code>
+            </li>
+          </ul>
+
+          <div class="history-section">
+            <div class="history-header">
+              <h4>Version History</h4>
+              <button type="button" class="btn btn-secondary btn-sm" onclick="app.loadHistory()">
+                📜 Inspect All Versions
+              </button>
+            </div>
+            <div id="history-timeline" class="history-timeline">
+              <p class="text-muted">Click "Inspect All Versions" to view historical snapshots.</p>
+            </div>
+          </div>
+
+          <div class="sync-status-section">
+            <h4>Recent Synchronization Attempts</h4>
+            <div id="sync-attempts-list" class="sync-attempts-list">
+              <p class="text-muted">Loading sync status...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>Project Green — Decentralized Cadastral Repository Architecture | Compliance with Official Data Provenance Rules</p>
+  </footer>
+
+  <script src="/app.js"></script>
+</body>
+</html>

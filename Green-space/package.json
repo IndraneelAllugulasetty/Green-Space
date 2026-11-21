@@ -1,0 +1,25 @@
+{
+  "name": "green-space",
+  "version": "1.0.0",
+  "description": "Project Green - Shared Land Data Repository, Synchronization & Versioning System",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "worker": "node src/worker/run-worker.js",
+    "migrate": "node src/db/migrate.js",
+    "seed": "node src/db/seed.js",
+    "test": "node --test tests/*.test.js"
+  },
+  "keywords": [
+    "cadastral",
+    "land-records",
+    "versioning",
+    "synchronization",
+    "repository",
+    "sqlite",
+    "postgres",
+    "redis"
+  ],
+  "author": "Project Green Architecture Team",
+  "license": "Apache-2.0"
+}
