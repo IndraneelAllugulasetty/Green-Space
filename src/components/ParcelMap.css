@@ -1,0 +1,18 @@
+
+.parcel-map-wrapper {
+  width: 100%;
+  height: 520px;
+  overflow: hidden;
+  border: 1px solid #dce5dc;
+  border-radius: 12px;
+}
+
+.parcel-map {
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+.leaflet-container {
+  font-family: Inter, sans-serif;
+}
