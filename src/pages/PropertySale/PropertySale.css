@@ -1,0 +1,404 @@
+.property-sale-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 32px 24px 72px;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.sale-header {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sale-shield-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  background: var(--color-brand-light);
+  color: var(--color-brand-primary);
+  border: 1px solid rgba(29, 107, 73, 0.25);
+  border-radius: var(--radius-full);
+  font-size: 11.5px;
+  font-weight: 700;
+  width: fit-content;
+}
+
+.sale-title {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--color-text-title);
+  margin: 0;
+}
+
+.sale-subtitle {
+  font-size: 14.5px;
+  color: var(--color-text-muted);
+  line-height: 1.6;
+  margin: 0;
+  max-width: 780px;
+}
+
+/* Staged Workflow Cards */
+.stages-container {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.stage-card {
+  background: #ffffff;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 30px;
+  box-shadow: var(--shadow-sm);
+  transition: all 200ms ease;
+}
+
+.stage-card.stage-active {
+  border-color: var(--color-brand-secondary);
+  box-shadow: var(--shadow-md);
+}
+
+.stage-card.stage-completed {
+  border-color: var(--color-success);
+  background: #fcfdfc;
+}
+
+.stage-card.stage-locked {
+  background: #fbfcfb;
+  opacity: 0.65;
+  filter: grayscale(40%);
+  border-style: dashed;
+}
+
+.stage-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.stage-step-pill {
+  font-size: 15px;
+  font-weight: 750;
+  color: var(--color-brand-primary);
+}
+
+.verified-stamp {
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--color-success);
+  background: var(--color-success-bg);
+  border: 1px solid rgba(29, 124, 77, 0.3);
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  letter-spacing: 0.5px;
+}
+
+.locked-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--color-text-muted);
+  background: var(--color-bg-subtle);
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+}
+
+.stage-desc {
+  font-size: 13.5px;
+  color: var(--color-text-body);
+  line-height: 1.55;
+  margin: 0 0 20px;
+}
+
+/* Testing Shortcut Bar */
+.testing-helpers-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: var(--color-bg-subtle);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  margin-bottom: 22px;
+  flex-wrap: wrap;
+}
+
+.test-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--color-text-muted);
+}
+
+.test-btn {
+  padding: 5px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  font-weight: 650;
+  cursor: pointer;
+  transition: all 140ms ease;
+  border: 1px solid transparent;
+}
+
+.test-btn.test-success {
+  background: var(--color-brand-light);
+  color: var(--color-brand-primary);
+  border-color: rgba(29, 107, 73, 0.2);
+}
+
+.test-btn.test-success:hover {
+  background: #dbeef0;
+}
+
+.test-btn.test-fail {
+  background: var(--color-danger-bg);
+  color: var(--color-danger);
+  border-color: rgba(197, 48, 48, 0.2);
+}
+
+.test-btn.test-fail:hover {
+  background: #fbd5d5;
+}
+
+/* Forms */
+.stage-form {
+  display: grid;
+  gap: 18px;
+}
+
+.form-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.field-group {
+  display: grid;
+  gap: 6px;
+}
+
+.field-group label {
+  font-size: 12.5px;
+  font-weight: 650;
+  color: var(--color-text-title);
+}
+
+.field-group select,
+.field-group input,
+.field-group textarea {
+  padding: 10px 13px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: #ffffff;
+  font-size: 13.5px;
+  font-family: inherit;
+  color: var(--color-text-title);
+  outline: none;
+  transition: border-color 150ms ease;
+}
+
+.field-group select:focus,
+.field-group input:focus,
+.field-group textarea:focus {
+  border-color: var(--color-brand-secondary);
+}
+
+.field-group select:disabled,
+.field-group input:disabled,
+.field-group textarea:disabled {
+  background: #f6f8f5;
+  cursor: not-allowed;
+}
+
+.checkbox-field {
+  display: flex;
+  align-items: flex-end;
+  padding-bottom: 10px;
+}
+
+.checkbox-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--color-text-body);
+  cursor: pointer;
+}
+
+.checkbox-label input {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--color-brand-secondary);
+}
+
+.seller-id-strip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  background: var(--color-brand-light);
+  border-radius: var(--radius-sm);
+  font-size: 12.5px;
+}
+
+.strip-label {
+  color: var(--color-brand-primary);
+}
+
+.strip-user {
+  color: var(--color-brand-primary);
+}
+
+.verify-owner-btn,
+.publish-sale-btn {
+  min-height: 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 180ms ease;
+  border: none;
+}
+
+.verify-owner-btn {
+  background: var(--color-brand-primary);
+  color: #ffffff;
+}
+
+.verify-owner-btn:hover:not(:disabled) {
+  background: var(--color-brand-secondary);
+}
+
+.verify-owner-btn:disabled {
+  opacity: 0.75;
+  cursor: wait;
+}
+
+.reverify-btn {
+  padding: 8px 16px;
+  background: transparent;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-muted);
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.reverify-btn:hover {
+  background: var(--color-bg-subtle);
+  color: var(--color-text-title);
+}
+
+.publish-sale-btn {
+  background: #1d7c4d;
+  color: #ffffff;
+}
+
+.publish-sale-btn:hover:not(:disabled) {
+  background: #15623c;
+}
+
+.publish-sale-btn:disabled {
+  background: #c3d4c9;
+  cursor: not-allowed;
+}
+
+/* Verification Result Feedback Box */
+.verification-result-box {
+  margin-top: 20px;
+  padding: 18px;
+  border-radius: var(--radius-md);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  animation: slideInDown 200ms ease;
+}
+
+@keyframes slideInDown {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.result-MATCHED_SUCCESS {
+  background: var(--color-success-bg);
+  border: 1px solid rgba(29, 124, 77, 0.3);
+}
+
+.result-OWNER_MISMATCH,
+.result-NOT_FOUND {
+  background: var(--color-danger-bg);
+  border: 1px solid rgba(197, 48, 48, 0.3);
+}
+
+.result-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.result-icon-check {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--color-success);
+  color: #ffffff;
+  display: grid;
+  place-items: center;
+  font-weight: 800;
+  font-size: 13px;
+}
+
+.result-icon-fail {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--color-danger);
+  color: #ffffff;
+  display: grid;
+  place-items: center;
+  font-weight: 800;
+  font-size: 13px;
+}
+
+.result-header h4 {
+  font-size: 15px;
+  font-weight: 750;
+  margin: 0;
+  color: var(--color-text-title);
+}
+
+.result-text {
+  font-size: 13px;
+  color: var(--color-text-body);
+  line-height: 1.55;
+  margin: 0;
+}
+
+.result-parcel-preview {
+  display: flex;
+  gap: 16px;
+  padding-top: 10px;
+  border-top: 1px dashed rgba(29, 124, 77, 0.25);
+  font-size: 12px;
+  color: var(--color-brand-primary);
+  flex-wrap: wrap;
+}
+
+@media (max-width: 768px) {
+  .form-grid-2 {
+    grid-template-columns: 1fr;
+  }
+}

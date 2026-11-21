@@ -1,0 +1,444 @@
+.gis-map-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 540px;
+  background: #ffffff;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+}
+
+.gis-map-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 18px;
+  background: #ffffff;
+  border-bottom: 1px solid var(--color-border);
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.gis-map-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.gis-status-indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.live-pulse {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--color-success);
+  box-shadow: 0 0 0 0 rgba(29, 124, 77, 0.7);
+  animation: pulseGreen 1.8s infinite;
+}
+
+@keyframes pulseGreen {
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(29, 124, 77, 0.7);
+  }
+  70% {
+    transform: scale(1);
+    box-shadow: 0 0 0 6px rgba(29, 124, 77, 0);
+  }
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(29, 124, 77, 0);
+  }
+}
+
+.gis-mode-text {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-brand-primary);
+}
+
+.gis-crs-tag {
+  font-size: 11px;
+  color: var(--color-text-muted);
+  background: var(--color-bg-subtle);
+  padding: 2px 8px;
+  border-radius: 4px;
+  border: 1px solid var(--color-border);
+}
+
+.gis-map-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.layer-toggle-group {
+  display: inline-flex;
+  background: var(--color-bg-subtle);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 2px;
+}
+
+.layer-btn {
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  border: none;
+  background: transparent;
+  color: var(--color-text-body);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 140ms ease;
+}
+
+.layer-btn.active {
+  background: var(--color-brand-primary);
+  color: #ffffff;
+}
+
+.boundary-toggle-btn {
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  border: 1px solid var(--color-border);
+  background: #ffffff;
+  color: var(--color-text-body);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 140ms ease;
+}
+
+.boundary-toggle-btn.active {
+  background: var(--color-brand-light);
+  border-color: var(--color-brand-secondary);
+  color: var(--color-brand-primary);
+}
+
+.zoom-btn-group {
+  display: flex;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.zoom-btn-group button {
+  width: 30px;
+  height: 30px;
+  border: none;
+  background: #ffffff;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--color-text-title);
+  cursor: pointer;
+  border-right: 1px solid var(--color-border);
+  display: grid;
+  place-items: center;
+}
+
+.zoom-btn-group button:last-child {
+  border-right: none;
+}
+
+.zoom-btn-group button:hover {
+  background: var(--color-bg-subtle);
+}
+
+/* Viewport */
+.gis-viewport {
+  position: relative;
+  flex: 1;
+  min-height: 440px;
+  overflow: hidden;
+  user-select: none;
+}
+
+.gis-viewport.cadastral-mode {
+  background: #f1f6f1;
+}
+
+.gis-viewport.satellite-mode {
+  background: #1b261e;
+  background-image: 
+    radial-gradient(circle at 50% 50%, rgba(46, 125, 50, 0.15) 0%, transparent 80%),
+    linear-gradient(45deg, #18221b 25%, #1d2a21 25%, #1d2a21 50%, #18221b 50%, #18221b 75%, #1d2a21 75%, #1d2a21 100%);
+  background-size: 100% 100%, 30px 30px;
+}
+
+.gis-pan-canvas {
+  position: absolute;
+  inset: 0;
+  transition: transform 200ms ease-out;
+  transform-origin: center center;
+}
+
+.cadastral-grid {
+  position: absolute;
+  inset: 0;
+  background-size: 40px 40px;
+  background-image:
+    linear-gradient(to right, rgba(29, 107, 73, 0.08) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(29, 107, 73, 0.08) 1px, transparent 1px);
+}
+
+.satellite-mode .cadastral-grid {
+  background-image:
+    linear-gradient(to right, rgba(255, 255, 255, 0.07) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.07) 1px, transparent 1px);
+}
+
+/* Polygons */
+.gis-cadastral-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.parcel-polygon {
+  fill: rgba(30, 115, 65, 0.22);
+  stroke: #1d6b49;
+  stroke-width: 0.6;
+  stroke-dasharray: 2 1;
+  cursor: pointer;
+  transition: all 180ms ease;
+}
+
+.satellite-mode .parcel-polygon {
+  fill: rgba(76, 175, 80, 0.28);
+  stroke: #81c784;
+  stroke-width: 0.8;
+}
+
+.parcel-polygon:hover {
+  fill: rgba(29, 107, 73, 0.45);
+  stroke: #0d3824;
+  stroke-width: 1;
+}
+
+.parcel-polygon.active-polygon {
+  fill: rgba(46, 139, 87, 0.55);
+  stroke: #123d2d;
+  stroke-width: 1.5;
+  stroke-dasharray: none;
+  filter: drop-shadow(0 2px 8px rgba(18, 61, 45, 0.3));
+}
+
+.satellite-mode .parcel-polygon.active-polygon {
+  fill: rgba(129, 199, 132, 0.6);
+  stroke: #ffffff;
+  stroke-width: 1.5;
+  stroke-dasharray: none;
+}
+
+.parcel-survey-label {
+  font-size: 3px;
+  font-weight: 800;
+  fill: #123d2d;
+  pointer-events: none;
+  letter-spacing: 0.2px;
+}
+
+.satellite-mode .parcel-survey-label {
+  fill: #ffffff;
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.8));
+}
+
+/* GPS User Marker */
+.user-gps-marker {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.gps-accuracy-circle {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: rgba(31, 111, 235, 0.15);
+  border: 1px dashed rgba(31, 111, 235, 0.5);
+  animation: pulseRadius 2s infinite;
+}
+
+@keyframes pulseRadius {
+  0% { transform: scale(0.9); opacity: 0.8; }
+  50% { transform: scale(1.15); opacity: 0.4; }
+  100% { transform: scale(0.9); opacity: 0.8; }
+}
+
+.gps-center-dot {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #1f6feb;
+  border: 2.5px solid #ffffff;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+.gps-pin-tooltip {
+  position: absolute;
+  top: -28px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(18, 61, 45, 0.9);
+  color: #fff;
+  padding: 3px 8px;
+  border-radius: 4px;
+  white-space: nowrap;
+  font-size: 10px;
+  font-weight: 600;
+  display: flex;
+  gap: 4px;
+}
+
+.gps-locating-overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(255, 255, 255, 0.95);
+  padding: 12px 24px;
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-brand-primary);
+  box-shadow: var(--shadow-md);
+}
+
+.locating-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--color-brand-secondary);
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Map Parcel Popup */
+.map-parcel-popup {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  width: 290px;
+  background: rgba(255, 255, 255, 0.97);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 14px;
+  box-shadow: var(--shadow-lg);
+  animation: fadeIn 180ms ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.popup-header {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.popup-badge {
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--color-brand-secondary);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.popup-survey {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--color-brand-primary);
+}
+
+.popup-details {
+  display: grid;
+  gap: 6px;
+}
+
+.popup-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11.5px;
+}
+
+.popup-label {
+  color: var(--color-text-muted);
+}
+
+.popup-val {
+  font-weight: 600;
+  color: var(--color-text-title);
+  text-align: right;
+  max-width: 170px;
+}
+
+.success-val {
+  color: var(--color-success);
+}
+
+/* Footer Coordinates Bar */
+.gis-map-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 18px;
+  background: var(--color-bg-subtle);
+  border-top: 1px solid var(--color-border);
+  font-size: 11.5px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.map-coord-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.coord-label {
+  font-weight: 700;
+  color: var(--color-text-muted);
+}
+
+.coord-value {
+  font-family: monospace;
+  font-weight: 600;
+  color: var(--color-text-title);
+}
+
+.scale-item {
+  margin-left: auto;
+}
+
+.map-scale-line {
+  display: inline-block;
+  width: 50px;
+  height: 4px;
+  border: 1px solid var(--color-text-title);
+  border-top: none;
+}
