@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigation } from '../../context/NavigationContext';
 import { MOCK_LAND_PARCELS, DISTRICT_LIST, TALUK_MAP } from '../../data/mockLandData';
 import { InteractiveCadastralMap } from '../../components/Map/InteractiveCadastralMap';
+import { CameraViewfinder } from '../../components/Camera/CameraViewfinder';
 import './PropertySearch.css';
 
 export function PropertySearch() {
@@ -17,6 +18,7 @@ export function PropertySearch() {
   const [userCoordinates, setUserCoordinates] = useState(null);
   const [capturedPhoto, setCapturedPhoto] = useState(null);
   const [photoMetadata, setPhotoMetadata] = useState(null);
+  const [isCameraOpen, setIsCameraOpen] = useState(false);
 
   // Filtered parcels
   const filteredParcels = MOCK_LAND_PARCELS.filter((parcel) => {
@@ -93,6 +95,27 @@ export function PropertySearch() {
     setPhotoMetadata(simulatedMeta);
     setUserCoordinates({ lat: 12.2958, lng: 76.6394, accuracyRadiusMeters: 3.5 });
     showToast(`Land Photograph uploaded: GPS Coordinates successfully extracted!`, 'success');
+  }
+
+  function handleCameraCapture({ imageUrl, coordinates, capturedAt }) {
+    setCapturedPhoto(imageUrl);
+    setUserCoordinates({
+      lat: coordinates.lat,
+      lng: coordinates.lng,
+      accuracyRadiusMeters: coordinates.accuracy,
+      elevation: '748m ASL'
+    });
+    setPhotoMetadata({
+      fileName: 'Live_Survey_Capture.jpg',
+      fileSize: '1.24 MB (Direct Video Stream)',
+      capturedAt,
+      deviceModel: 'In-App GNSS Surveyor Camera',
+      hasGeotag: true,
+      extractedLat: Number(coordinates.lat).toFixed(5),
+      extractedLng: Number(coordinates.lng).toFixed(5)
+    });
+    setIsCameraOpen(false);
+    showToast('Live land photograph captured with precision GNSS coordinates!', 'success');
   }
 
   function handleSelectParcel(parcel) {
@@ -216,12 +239,22 @@ export function PropertySearch() {
               <div className="gps-action-banner">
                 <button
                   type="button"
+                  className="camera-launch-btn"
+                  onClick={() => setIsCameraOpen(true)}
+                  title="Open live camera with surveyor viewfinder"
+                >
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                  Live Camera Viewfinder
+                </button>
+
+                <button
+                  type="button"
                   className="gps-locate-btn"
                   onClick={handleCaptureGPS}
                   disabled={isLocating}
                 >
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/></svg>
-                  {isLocating ? 'Acquiring GPS Fix...' : 'Capture Current Location'}
+                  {isLocating ? 'Acquiring GPS Fix...' : 'Acquire GPS Fix'}
                 </button>
 
                 <label className="photo-upload-label">
@@ -233,7 +266,7 @@ export function PropertySearch() {
                     style={{ display: 'none' }} 
                   />
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-                  Upload Land Photo
+                  Upload File
                 </label>
               </div>
 
@@ -360,6 +393,14 @@ export function PropertySearch() {
           />
         </div>
       </div>
+
+      {/* Live Camera Viewfinder Modal */}
+      {isCameraOpen && (
+        <CameraViewfinder
+          onCapture={handleCameraCapture}
+          onClose={() => setIsCameraOpen(false)}
+        />
+      )}
     </div>
   );
 }

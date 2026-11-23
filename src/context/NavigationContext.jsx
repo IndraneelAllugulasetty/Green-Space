@@ -6,8 +6,8 @@ const NavigationContext = createContext(null);
 
 export function NavigationProvider({ children }) {
   const { isAuthenticated } = useAuth();
-  // Default to 'dashboard' if already logged in, otherwise 'login'
-  const [currentView, setCurrentView] = useState(() => (isAuthenticated ? 'dashboard' : 'login'));
+  // Default to 'dashboard' if already logged in, otherwise 'landing'
+  const [currentView, setCurrentView] = useState(() => (isAuthenticated ? 'dashboard' : 'landing'));
   const [selectedLand, setSelectedLand] = useState(MOCK_LAND_PARCELS[0]);
   const [toast, setToast] = useState(null);
 

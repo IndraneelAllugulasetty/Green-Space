@@ -80,6 +80,16 @@ export function Login() {
   return (
     <main className="login-page">
       <section className="login-card" aria-labelledby="login-title">
+        <div className="login-top-nav">
+          <button
+            type="button"
+            className="back-home-link"
+            onClick={() => navigateTo('landing')}
+          >
+            ← Back to Homepage
+          </button>
+        </div>
+
         <Brand />
 
         <div className="login-intro">
