@@ -1,8 +1,11 @@
+import { useState } from 'react';
 import { useNavigation } from '../../context/NavigationContext';
+import { VerificationCertificate } from '../../components/Certificate/VerificationCertificate';
 import './LandDetails.css';
 
 export function LandDetails() {
   const { selectedLand, navigateTo, showToast } = useNavigation();
+  const [showCertificate, setShowCertificate] = useState(false);
 
   if (!selectedLand) {
     return (
@@ -38,6 +41,16 @@ export function LandDetails() {
         </button>
 
         <div className="top-action-btns">
+          <button
+            type="button"
+            className="view-cert-action-btn"
+            onClick={() => setShowCertificate(true)}
+            title="Open official digital certificate of authenticity"
+          >
+            <span className="cert-badge-star">★</span>
+            Digital Title Certificate
+          </button>
+
           <button
             type="button"
             className="print-dossier-btn"
@@ -296,6 +309,14 @@ export function LandDetails() {
           <strong>Notice:</strong> This verification dossier is compiled by Project Green using digitized cadastral boundaries, Bhoomi land-record feeds, and Mojini spatial indices from the Government of Karnataka. Preliminary research only; official certified copies should be obtained from the respective Taluk Sub-Registrar Office for registration.
         </p>
       </footer>
+
+      {/* Official Digital Land Verification Certificate Modal */}
+      {showCertificate && (
+        <VerificationCertificate
+          parcel={selectedLand}
+          onClose={() => setShowCertificate(false)}
+        />
+      )}
     </div>
   );
 }

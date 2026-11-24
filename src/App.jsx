@@ -9,6 +9,7 @@ import { Dashboard } from './pages/Dashboard/Dashboard';
 import { PropertySearch } from './pages/PropertySearch/PropertySearch';
 import { LandDetails } from './pages/LandDetails/LandDetails';
 import { PropertySale } from './pages/PropertySale/PropertySale';
+import { Marketplace } from './pages/Marketplace/Marketplace';
 import './App.css';
 
 function AppContent() {
@@ -50,6 +51,7 @@ function AppContent() {
       <main className="main-content-area" id="main-content">
         {currentView === 'dashboard' && <Dashboard />}
         {currentView === 'search' && <PropertySearch />}
+        {currentView === 'marketplace' && <Marketplace />}
         {currentView === 'land-details' && <LandDetails />}
         {currentView === 'upload-sale' && <PropertySale />}
         {currentView === 'login' && <Dashboard />}
