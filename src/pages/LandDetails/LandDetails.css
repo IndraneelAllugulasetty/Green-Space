@@ -38,6 +38,31 @@
   gap: 12px;
 }
 
+.view-cert-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: var(--color-brand-light);
+  color: var(--color-brand-primary);
+  border: 1px solid rgba(29, 107, 73, 0.3);
+  border-radius: var(--radius-md);
+  font-size: 13px;
+  font-weight: 750;
+  cursor: pointer;
+  transition: all 160ms ease;
+}
+
+.view-cert-action-btn:hover {
+  background: #dbebe0;
+  transform: translateY(-1px);
+}
+
+.cert-badge-star {
+  color: #b26a00;
+  font-size: 14px;
+}
+
 .print-dossier-btn {
   display: inline-flex;
   align-items: center;
