@@ -5,11 +5,9 @@ import { Navbar } from './components/Navbar/Navbar';
 import { Toast } from './components/Toast/Toast';
 import { LandingPage } from './pages/LandingPage/LandingPage';
 import { Login } from './pages/Login/Login';
-import { Dashboard } from './pages/Dashboard/Dashboard';
 import { PropertySearch } from './pages/PropertySearch/PropertySearch';
 import { LandDetails } from './pages/LandDetails/LandDetails';
 import { PropertySale } from './pages/PropertySale/PropertySale';
-import { Marketplace } from './pages/Marketplace/Marketplace';
 import './App.css';
 
 function AppContent() {
@@ -49,12 +47,10 @@ function AppContent() {
     <div className="app-wrapper">
       <Navbar />
       <main className="main-content-area" id="main-content">
-        {currentView === 'dashboard' && <Dashboard />}
-        {currentView === 'search' && <PropertySearch />}
-        {currentView === 'marketplace' && <Marketplace />}
+        {(currentView === 'search' || currentView === 'dashboard') && <PropertySearch />}
         {currentView === 'land-details' && <LandDetails />}
         {currentView === 'upload-sale' && <PropertySale />}
-        {currentView === 'login' && <Dashboard />}
+        {currentView === 'login' && <PropertySearch />}
       </main>
       <Toast />
     </div>

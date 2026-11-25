@@ -26,7 +26,7 @@ export function Navbar() {
         {/* Brand */}
         <div 
           className="navbar-brand" 
-          onClick={() => handleNav('dashboard')}
+          onClick={() => handleNav('search')}
           role="button"
           tabIndex={0}
           aria-label="Project Green Home"
@@ -45,20 +45,6 @@ export function Navbar() {
         <nav className="navbar-links" aria-label="Main Navigation">
           <button
             type="button"
-            className={`nav-link-btn ${currentView === 'dashboard' ? 'active' : ''}`}
-            onClick={() => handleNav('dashboard')}
-          >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <rect x="3" y="3" width="7" height="7"></rect>
-              <rect x="14" y="3" width="7" height="7"></rect>
-              <rect x="14" y="14" width="7" height="7"></rect>
-              <rect x="3" y="14" width="7" height="7"></rect>
-            </svg>
-            {t('nav_dashboard')}
-          </button>
-
-          <button
-            type="button"
             className={`nav-link-btn ${currentView === 'search' || currentView === 'land-details' ? 'active' : ''}`}
             onClick={() => handleNav('search')}
           >
@@ -67,18 +53,6 @@ export function Navbar() {
               <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
             </svg>
             {t('nav_search')}
-          </button>
-
-          <button
-            type="button"
-            className={`nav-link-btn ${currentView === 'marketplace' ? 'active' : ''}`}
-            onClick={() => handleNav('marketplace')}
-          >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-              <polyline points="9 22 9 12 15 12 15 22"></polyline>
-            </svg>
-            {t('nav_marketplace')}
           </button>
 
           <button
@@ -152,24 +126,10 @@ export function Navbar() {
         <div className="navbar-mobile-menu">
           <button
             type="button"
-            className={`mobile-menu-item ${currentView === 'dashboard' ? 'active' : ''}`}
-            onClick={() => handleNav('dashboard')}
-          >
-            {t('nav_dashboard')}
-          </button>
-          <button
-            type="button"
             className={`mobile-menu-item ${currentView === 'search' || currentView === 'land-details' ? 'active' : ''}`}
             onClick={() => handleNav('search')}
           >
             {t('nav_search')}
-          </button>
-          <button
-            type="button"
-            className={`mobile-menu-item ${currentView === 'marketplace' ? 'active' : ''}`}
-            onClick={() => handleNav('marketplace')}
-          >
-            {t('nav_marketplace')}
           </button>
           <button
             type="button"

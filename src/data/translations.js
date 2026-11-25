@@ -4,9 +4,7 @@ export const TRANSLATIONS = {
   en: {
     brand_title: 'PROJECT GREEN',
     brand_sub: 'Smart Land Verification',
-    nav_dashboard: 'Dashboard',
     nav_search: 'Search & Verify Land',
-    nav_marketplace: 'Marketplace',
     nav_sell: 'Upload for Sale',
     nav_exit: 'Exit',
     tag_landholder: 'Karnataka Landholder',
@@ -38,9 +36,7 @@ export const TRANSLATIONS = {
   kn: {
     brand_title: 'ಪ್ರಾಜೆಕ್ಟ್ ಗ್ರೀನ್',
     brand_sub: 'ಸ್ಮಾರ್ಟ್ ಭೂಮಿ ಪರಿಶೀಲನಾ ವ್ಯವಸ್ಥೆ',
-    nav_dashboard: 'ಡ್ಯಾಶ್‌ಬೋರ್ಡ್',
     nav_search: 'ಜಮೀನು ಹುಡುಕಿ & ಪರಿಶೀಲಿಸಿ',
-    nav_marketplace: 'ಭೂಮಿ ಮಾರುಕಟ್ಟೆ',
     nav_sell: 'ಮಾರಾಟಕ್ಕೆ ನೋಂದಾಯಿಸಿ',
     nav_exit: 'ನಿರ್ಗಮಿಸಿ',
     tag_landholder: 'ಕರ್ನಾಟಕ ಖಾತೇದಾರರು',
