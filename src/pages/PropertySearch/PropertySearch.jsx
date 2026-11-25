@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useNavigation } from '../../context/NavigationContext';
 import { MOCK_LAND_PARCELS, DISTRICT_LIST, TALUK_MAP } from '../../data/mockLandData';
 import { InteractiveCadastralMap } from '../../components/Map/InteractiveCadastralMap';
 import { CameraViewfinder } from '../../components/Camera/CameraViewfinder';
+import { formatDistance, rankParcels, toDms } from '../../gis/geo';
 import './PropertySearch.css';
 
 export function PropertySearch() {
@@ -19,6 +20,7 @@ export function PropertySearch() {
   const [capturedPhoto, setCapturedPhoto] = useState(null);
   const [photoMetadata, setPhotoMetadata] = useState(null);
   const [isCameraOpen, setIsCameraOpen] = useState(false);
+  const [searchRadius, setSearchRadius] = useState('all');
 
   // Filtered parcels
   const filteredParcels = MOCK_LAND_PARCELS.filter((parcel) => {
@@ -37,6 +39,21 @@ export function PropertySearch() {
     }
     return true;
   });
+
+  const spatialMatches = useMemo(() => {
+    if (!userCoordinates) return null;
+    return rankParcels(userCoordinates, filteredParcels);
+  }, [userCoordinates, filteredParcels]);
+
+  const radiusMeters = searchRadius === 'all' ? null : Number(searchRadius);
+  const visibleMatches = spatialMatches
+    ? spatialMatches.filter((match) => radiusMeters === null || match.distanceMeters <= radiusMeters)
+    : filteredParcels.map((parcel) => ({
+        parcel,
+        distanceMeters: null,
+        insideBoundary: false
+      }));
+  const nearestMatch = spatialMatches?.[0] ?? null;
 
   // Handle GPS Locate Me
   function handleCaptureGPS() {
@@ -296,7 +313,14 @@ export function PropertySearch() {
                       <div className="meta-grid">
                         <div><span>File:</span> <strong>{photoMetadata.fileName}</strong></div>
                         <div><span>Coordinates:</span> <strong>{photoMetadata.extractedLat}° N, {photoMetadata.extractedLng}° E</strong></div>
-                        <div><span>Matched Cadastre:</span> <strong>Mysuru / Hunsur Survey No. 84/2A</strong></div>
+                        <div>
+                          <span>Matched Cadastre:</span>{' '}
+                          <strong>
+                            {nearestMatch
+                              ? `${nearestMatch.parcel.district} / ${nearestMatch.parcel.taluk} Survey No. ${nearestMatch.parcel.surveyNumber} (${formatDistance(nearestMatch.distanceMeters)})`
+                              : 'No parcel in the current filter'}
+                          </strong>
+                        </div>
                       </div>
                     </div>
                   )}
@@ -305,18 +329,46 @@ export function PropertySearch() {
             </div>
           )}
 
+          {userCoordinates && (
+            <div className="proximity-banner">
+              <div>
+                <strong>GNSS proximity search</strong>
+                <p>
+                  Fix {toDms(Number(userCoordinates.lat), 'lat')}, {toDms(Number(userCoordinates.lng), 'lng')}
+                  {nearestMatch
+                    ? nearestMatch.insideBoundary
+                      ? ` · inside Survey ${nearestMatch.parcel.surveyNumber}`
+                      : ` · nearest is Survey ${nearestMatch.parcel.surveyNumber} at ${formatDistance(nearestMatch.distanceMeters)}`
+                    : ''}
+                </p>
+              </div>
+              <label>
+                Radius
+                <select value={searchRadius} onChange={(event) => setSearchRadius(event.target.value)}>
+                  <option value="all">All distances</option>
+                  <option value="1000">1 km</option>
+                  <option value="5000">5 km</option>
+                  <option value="25000">25 km</option>
+                  <option value="100000">100 km</option>
+                </select>
+              </label>
+            </div>
+          )}
+
           {/* Results List */}
           <div className="search-results-container">
             <div className="results-header-bar">
               <span className="results-count">
-                <strong>{filteredParcels.length}</strong> Land Parcels Found
+                <strong>{visibleMatches.length}</strong> Land Parcels Found
               </span>
-              <span className="results-tip">Click a parcel to view on map</span>
+              <span className="results-tip">
+                {userCoordinates ? 'Sorted by distance from the GNSS fix' : 'Click a parcel to view on map'}
+              </span>
             </div>
 
             <div className="results-list">
-              {filteredParcels.length > 0 ? (
-                filteredParcels.map((parcel) => {
+              {visibleMatches.length > 0 ? (
+                visibleMatches.map(({ parcel, distanceMeters, insideBoundary }) => {
                   const isSelected = selectedLand?.id === parcel.id;
                   return (
                     <div
@@ -340,7 +392,13 @@ export function PropertySearch() {
 
                         <div className="item-meta-row">
                           <span className="item-owner">Owner: {parcel.ownerName}</span>
-                          <span className="item-class-tag">{parcel.landClassification.split(' ')[0]}</span>
+                          {distanceMeters !== null ? (
+                            <span className={`item-distance ${insideBoundary ? 'inside' : ''}`}>
+                              {insideBoundary ? 'Inside boundary' : formatDistance(distanceMeters)}
+                            </span>
+                          ) : (
+                            <span className="item-class-tag">{parcel.landClassification.split(' ')[0]}</span>
+                          )}
                         </div>
 
                         <div className="item-actions">
@@ -385,11 +443,19 @@ export function PropertySearch() {
         {/* Right Side: Interactive Map */}
         <div className="search-right-map-panel">
           <InteractiveCadastralMap
-            parcels={filteredParcels}
+            parcels={visibleMatches.map((match) => match.parcel)}
             selectedParcel={selectedLand}
             onSelectParcel={handleSelectParcel}
             userCoordinates={userCoordinates}
             isLocating={isLocating}
+            proximityRadiusMeters={radiusMeters}
+            onCoordinateJump={(coords) => {
+              setUserCoordinates(coords);
+              showToast(
+                `Coordinate fix set: ${coords.lat.toFixed(5)}°, ${coords.lng.toFixed(5)}°. Parcels ranked by geodesic distance.`,
+                'info'
+              );
+            }}
           />
         </div>
       </div>

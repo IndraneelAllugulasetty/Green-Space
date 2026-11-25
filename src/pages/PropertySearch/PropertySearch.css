@@ -330,6 +330,57 @@
   margin-bottom: 12px;
 }
 
+.proximity-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+  padding: 12px 14px;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: var(--radius-md);
+}
+
+.proximity-banner strong {
+  display: block;
+  font-size: 13px;
+  color: #1e3a8a;
+}
+
+.proximity-banner p {
+  margin: 4px 0 0;
+  font-size: 12px;
+  color: #1e40af;
+}
+
+.proximity-banner label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #1e3a8a;
+}
+
+.proximity-banner select {
+  padding: 6px 8px;
+  border: 1px solid #bfdbfe;
+  border-radius: 4px;
+  background: #ffffff;
+}
+
+.item-distance {
+  font-size: 11px;
+  font-weight: 750;
+  color: #1d4ed8;
+}
+
+.item-distance.inside {
+  color: var(--color-brand-primary);
+}
+
 .results-count {
   font-size: 13.5px;
   color: var(--color-text-title);

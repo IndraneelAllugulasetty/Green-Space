@@ -93,14 +93,100 @@
   color: #ffffff;
 }
 
-.boundary-toggle-btn {
+.boundary-toggle-btn,
+.measure-btn,
+.export-btn {
   padding: 6px 10px;
   font-size: 11px;
   font-weight: 600;
-  color: #92400e;
-  background: #fffbeb;
-  border: 1px solid #fcd34d;
+  color: var(--color-text-body);
+  background: #ffffff;
+  border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.boundary-toggle-btn.active,
+.measure-btn.active {
+  color: #ffffff;
+  background: var(--color-brand-primary);
+  border-color: var(--color-brand-primary);
+}
+
+.gis-coord-jump {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 8px 18px;
+  border-bottom: 1px solid var(--color-border);
+  background: #f8faf8;
+}
+
+.gis-coord-jump label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--color-text-muted);
+}
+
+.gis-coord-jump input {
+  flex: 1;
+  min-width: 160px;
+  padding: 6px 8px;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  font-size: 12px;
+  font-family: monospace;
+}
+
+.gis-coord-jump button {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 4px;
+  background: var(--color-brand-primary);
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.coord-jump-error {
+  width: 100%;
+  font-size: 11px;
+  color: #b45309;
+}
+
+.measure-readout {
+  position: absolute;
+  top: 12px;
+  left: 150px;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  background: rgba(255, 255, 255, 0.96);
+  border: 1px solid #fcd34d;
+  border-radius: 6px;
+  font-size: 12px;
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.2);
+}
+
+.measure-readout button {
+  border: none;
+  background: transparent;
+  color: #92400e;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.gis-map-card.compact {
+  min-height: 380px;
+}
+
+.gis-map-card.compact .gis-viewport,
+.gis-map-card.compact .gis-leaflet-map {
+  min-height: 280px;
 }
 
 /* Leaflet viewport */
