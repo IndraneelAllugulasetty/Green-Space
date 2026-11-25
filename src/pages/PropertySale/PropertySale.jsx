@@ -115,8 +115,8 @@ export function PropertySale() {
         };
       }
 
-      showToast('Property listed successfully! It is now active on Project Green Marketplace.', 'success');
-      navigateTo('dashboard');
+      showToast('Property listed successfully! It is now active on Project Green.', 'success');
+      navigateTo('search');
     }, 500);
   }
 

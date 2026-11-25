@@ -9,7 +9,7 @@
 
 .search-page-header {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 20px;
@@ -29,39 +29,29 @@
   max-width: 680px;
 }
 
-/* Tabs */
-.search-mode-tabs {
-  display: inline-flex;
-  background: var(--color-bg-subtle);
-  border: 1px solid var(--color-border);
-  padding: 4px;
-  border-radius: var(--radius-md);
-  gap: 4px;
-}
-
-.mode-tab-btn {
+.locate-gps-top-btn {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 8px 16px;
-  border: none;
-  background: transparent;
-  color: var(--color-text-body);
-  font-size: 13px;
-  font-weight: 600;
+  padding: 9px 16px;
+  background: var(--color-brand-primary);
+  color: #ffffff;
+  border: 1px solid var(--color-brand-primary);
   border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 650;
   cursor: pointer;
   transition: all 160ms ease;
+  white-space: nowrap;
 }
 
-.mode-tab-btn.active {
-  background: #ffffff;
-  color: var(--color-brand-primary);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+.locate-gps-top-btn:hover:not(:disabled) {
+  background: var(--color-brand-secondary);
 }
 
-.mode-tab-btn.active svg {
-  color: var(--color-brand-secondary);
+.locate-gps-top-btn:disabled {
+  opacity: 0.75;
+  cursor: wait;
 }
 
 /* Split Layout */
@@ -92,13 +82,6 @@
   font-weight: 700;
   color: var(--color-text-title);
   margin: 0 0 14px;
-}
-
-.filter-card-sub {
-  font-size: 12.5px;
-  color: var(--color-text-muted);
-  line-height: 1.5;
-  margin: 0 0 16px;
 }
 
 .filter-fields-row {
@@ -156,158 +139,6 @@
   font-size: 16px;
   color: var(--color-text-muted);
   cursor: pointer;
-}
-
-/* Geotag Card */
-.gps-action-banner {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-.camera-launch-btn {
-  flex: 1.2;
-  min-height: 44px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  font-size: 13px;
-  font-weight: 700;
-  border-radius: var(--radius-sm);
-  cursor: pointer;
-  transition: all 160ms ease;
-  white-space: nowrap;
-  padding: 0 14px;
-  background: var(--color-brand-primary);
-  color: #ffffff;
-  border: 1px solid var(--color-brand-primary);
-  box-shadow: 0 2px 6px rgba(18, 61, 45, 0.2);
-}
-
-.camera-launch-btn:hover {
-  background: var(--color-brand-secondary);
-}
-
-.gps-locate-btn,
-.photo-upload-label {
-  flex: 1;
-  min-height: 44px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  font-size: 13px;
-  font-weight: 650;
-  border-radius: var(--radius-sm);
-  cursor: pointer;
-  transition: all 160ms ease;
-  white-space: nowrap;
-  padding: 0 14px;
-}
-
-.gps-locate-btn {
-  background: #ffffff;
-  color: var(--color-brand-primary);
-  border: 1px solid var(--color-border);
-}
-
-.gps-locate-btn:hover:not(:disabled) {
-  background: var(--color-bg-subtle);
-  border-color: var(--color-border-hover);
-}
-
-.gps-locate-btn:hover:not(:disabled) {
-  background: var(--color-brand-secondary);
-}
-
-.gps-locate-btn:disabled {
-  opacity: 0.75;
-  cursor: wait;
-}
-
-.photo-upload-label {
-  background: var(--color-brand-light);
-  color: var(--color-brand-primary);
-  border: 1px dashed var(--color-brand-secondary);
-}
-
-.photo-upload-label:hover {
-  background: #dbeef0;
-}
-
-.photo-preview-wrap {
-  margin-top: 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.photo-preview-frame {
-  position: relative;
-  height: 140px;
-  border-radius: var(--radius-sm);
-  overflow: hidden;
-}
-
-.photo-preview-frame img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.retake-photo-btn {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  padding: 4px 10px;
-  background: rgba(0, 0, 0, 0.7);
-  color: #ffffff;
-  border: none;
-  border-radius: var(--radius-sm);
-  font-size: 11px;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.photo-metadata-card {
-  padding: 12px;
-  background: var(--color-bg-subtle);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
-  display: grid;
-  gap: 8px;
-}
-
-.meta-badge-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.meta-badge.success {
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--color-success);
-  background: var(--color-success-bg);
-  padding: 2px 8px;
-  border-radius: 4px;
-}
-
-.meta-time {
-  font-size: 11px;
-  color: var(--color-text-muted);
-}
-
-.meta-grid {
-  display: grid;
-  gap: 4px;
-  font-size: 12px;
-  color: var(--color-text-body);
-}
-
-.meta-grid strong {
-  color: var(--color-text-title);
 }
 
 /* Results Container */
@@ -406,7 +237,7 @@
 
 .item-extent {
   font-size: 11.5px;
-  font-weight: 600;
+  font-weight: 650;
   color: var(--color-brand-secondary);
 }
 

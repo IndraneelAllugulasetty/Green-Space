@@ -54,7 +54,7 @@ export function Login() {
       setIsSubmitting(false);
       const user = login({ email, password });
       showToast(`Welcome back, ${user.name}! Connected to Project Green.`);
-      navigateTo('dashboard');
+      navigateTo('search');
     }, 400);
   }
 
