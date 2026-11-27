@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigation } from '../../context/NavigationContext';
 import { useLanguage } from '../../context/LanguageContext';
@@ -7,8 +7,20 @@ import './Navbar.css';
 export function Navbar() {
   const { user, logout } = useAuth();
   const { currentView, navigateTo } = useNavigation();
-  const { lang, toggleLanguage, t } = useLanguage();
+  const { lang, setLanguage, languages, activeLanguage, t } = useLanguage();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [langMenuOpen, setLangMenuOpen] = useState(false);
+  const langMenuRef = useRef(null);
+
+  useEffect(() => {
+    function handleClickOutside(e) {
+      if (langMenuRef.current && !langMenuRef.current.contains(e.target)) {
+        setLangMenuOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   function handleLogout() {
     logout();
@@ -69,17 +81,42 @@ export function Navbar() {
 
         {/* User Profile & Actions */}
         <div className="navbar-user-actions">
-          {/* Language Switcher Pill */}
-          <button
-            type="button"
-            className="lang-switcher-btn"
-            onClick={toggleLanguage}
-            title={lang === 'en' ? 'ಕನ್ನಡಕ್ಕೆ ಬದಲಾಯಿಸಿ' : 'Switch to English'}
-            aria-label="Toggle Language"
-          >
-            <span className="lang-globe-icon">🌐</span>
-            <span className="lang-code-tag">{lang === 'en' ? 'ಕನ್ನಡ' : 'English'}</span>
-          </button>
+          {/* Multi-Language Dropdown */}
+          <div className="lang-switcher-wrap" ref={langMenuRef}>
+            <button
+              type="button"
+              className="lang-switcher-btn"
+              onClick={() => setLangMenuOpen(!langMenuOpen)}
+              title="Change Language / ಭಾಷೆ ಬದಲಾಯಿಸಿ / भाषा बदलें"
+              aria-label="Change Language"
+              aria-expanded={langMenuOpen}
+            >
+              <span className="lang-globe-icon">🌐</span>
+              <span className="lang-code-tag">{activeLanguage?.native || 'English'}</span>
+              <span className="lang-dropdown-arrow">▾</span>
+            </button>
+
+            {langMenuOpen && (
+              <div className="lang-dropdown-menu" role="menu">
+                {languages.map((item) => (
+                  <button
+                    key={item.code}
+                    type="button"
+                    className={`lang-option-btn ${lang === item.code ? 'active' : ''}`}
+                    onClick={() => {
+                      setLanguage(item.code);
+                      setLangMenuOpen(false);
+                    }}
+                    role="menuitem"
+                  >
+                    <span className="lang-option-native">{item.native}</span>
+                    <span className="lang-option-label">({item.label})</span>
+                    {lang === item.code && <span className="lang-check-mark">✓</span>}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
 
           {user && (
             <div className="user-profile-badge" title={user.email}>
@@ -138,13 +175,24 @@ export function Navbar() {
           >
             {t('nav_sell')}
           </button>
-          <button
-            type="button"
-            className="mobile-menu-item"
-            onClick={toggleLanguage}
-          >
-            🌐 Language: {lang === 'en' ? 'ಕನ್ನಡಕ್ಕೆ ಬದಲಾಯಿಸಿ' : 'Switch to English'}
-          </button>
+
+          {/* Mobile Language Switcher Row */}
+          <div className="mobile-lang-row">
+            <span className="mobile-lang-label">🌐 Language:</span>
+            <div className="mobile-lang-pills">
+              {languages.map((item) => (
+                <button
+                  key={item.code}
+                  type="button"
+                  className={`mobile-lang-pill ${lang === item.code ? 'active' : ''}`}
+                  onClick={() => setLanguage(item.code)}
+                >
+                  {item.native}
+                </button>
+              ))}
+            </div>
+          </div>
+
           <button
             type="button"
             className="mobile-menu-item logout"

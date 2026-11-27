@@ -1,17 +1,19 @@
 import { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigation } from '../../context/NavigationContext';
+import { useLanguage } from '../../context/LanguageContext';
 import { DEMO_USER } from '../../data/mockLandData';
 import './Login.css';
 
 function Brand() {
+  const { t } = useLanguage();
   return (
     <div className="brand" aria-label="Project Green">
       <span className="brand-mark" aria-hidden="true">
         <span className="brand-leaf brand-leaf-left" />
         <span className="brand-leaf brand-leaf-right" />
       </span>
-      <span className="brand-name">PROJECT GREEN</span>
+      <span className="brand-name">{t('brand_title')}</span>
     </div>
   );
 }
@@ -19,6 +21,7 @@ function Brand() {
 export function Login() {
   const { login } = useAuth();
   const { navigateTo, showToast } = useNavigation();
+  const { lang, setLanguage, languages, activeLanguage, t } = useLanguage();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -27,6 +30,7 @@ export function Login() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState({});
   const [statusMessage, setStatusMessage] = useState('');
+  const [isLangOpen, setIsLangOpen] = useState(false);
 
   function handleSubmit(event) {
     event.preventDefault();
@@ -80,24 +84,85 @@ export function Login() {
   return (
     <main className="login-page">
       <section className="login-card" aria-labelledby="login-title">
-        <div className="login-top-nav">
+        <div className="login-top-nav" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <button
             type="button"
             className="back-home-link"
             onClick={() => navigateTo('landing')}
           >
-            ← Back to Homepage
+            ← {t('brand_title')}
           </button>
+
+          {/* Quick Language Selector on Login Screen */}
+          <div style={{ position: 'relative' }}>
+            <button
+              type="button"
+              className="lang-switcher-btn"
+              onClick={() => setIsLangOpen(!isLangOpen)}
+              title="Change Language"
+              style={{ padding: '4px 10px', fontSize: '11.5px' }}
+            >
+              <span>🌐</span>
+              <span>{activeLanguage?.native || 'English'}</span>
+              <span>▾</span>
+            </button>
+            {isLangOpen && (
+              <div
+                style={{
+                  position: 'absolute',
+                  top: '100%',
+                  right: 0,
+                  marginTop: '4px',
+                  background: '#ffffff',
+                  border: '1px solid var(--color-border)',
+                  borderRadius: '8px',
+                  boxShadow: '0 4px 16px rgba(0,0,0,0.12)',
+                  padding: '4px',
+                  zIndex: 20,
+                  minWidth: '130px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '2px'
+                }}
+              >
+                {languages.map((l) => (
+                  <button
+                    key={l.code}
+                    type="button"
+                    onClick={() => {
+                      setLanguage(l.code);
+                      setIsLangOpen(false);
+                    }}
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      padding: '6px 10px',
+                      background: lang === l.code ? 'var(--color-brand-light)' : 'transparent',
+                      border: 'none',
+                      borderRadius: '4px',
+                      cursor: 'pointer',
+                      fontSize: '12.5px',
+                      fontWeight: lang === l.code ? 'bold' : 'normal',
+                      color: 'var(--color-text-body)'
+                    }}
+                  >
+                    <span>{l.native}</span>
+                    {lang === l.code && <span style={{ color: 'var(--color-brand-primary)' }}>✓</span>}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
 
         <Brand />
 
         <div className="login-intro">
-          <h1 id="login-title">Welcome back</h1>
-          <p>Sign in to access verified Karnataka land records & cadastral maps.</p>
+          <h1 id="login-title">{t('login_title')}</h1>
+          <p>{t('login_sub')}</p>
         </div>
 
-        {/* Demo Fast Login Pill for Resume Reviewers */}
+        {/* Demo Fast Login Pill for Reviewers */}
         <div className="demo-pill-box">
           <button
             type="button"
@@ -105,14 +170,14 @@ export function Login() {
             onClick={handleDemoFill}
             title="Auto-fill with sample Karnataka landholder account"
           >
-            <span className="demo-pill-badge">Demo Account</span>
-            <span className="demo-pill-text">hasnain@projectgreen.in (Click to fill)</span>
+            <span className="demo-pill-badge">{t('login_demo_hint')}</span>
+            <span className="demo-pill-text">{DEMO_USER.email}</span>
           </button>
         </div>
 
         <form className="login-form" onSubmit={handleSubmit} noValidate>
           <div className="form-field">
-            <label htmlFor="email">Email address</label>
+            <label htmlFor="email">{t('login_lbl_email')}</label>
             <input
               autoComplete="email"
               id="email"
@@ -123,7 +188,7 @@ export function Login() {
               onChange={(event) => updateEmail(event.target.value)}
               aria-invalid={Boolean(errors.email)}
               aria-describedby={errors.email ? 'email-error' : undefined}
-              placeholder="you@company.com"
+              placeholder={t('login_placeholder_email')}
             />
             {errors.email && (
               <span className="field-error" id="email-error">
@@ -134,17 +199,17 @@ export function Login() {
 
           <div className="form-field">
             <div className="label-row">
-              <label htmlFor="password">Password</label>
+              <label htmlFor="password">{t('login_lbl_password')}</label>
               <button
                 className="text-button forgot-link"
                 type="button"
                 onClick={() =>
                   setStatusMessage(
-                    'Demo Mode: Enter any password or click "Demo Account" above.',
+                    'Demo Mode: Click "Demo Account" above.',
                   )
                 }
               >
-                Forgot password?
+                Forgot?
               </button>
             </div>
             <div className="password-input-wrap">
@@ -160,7 +225,7 @@ export function Login() {
                 aria-describedby={
                   errors.password ? 'password-error' : undefined
                 }
-                placeholder="Enter your password"
+                placeholder={t('login_placeholder_password')}
               />
               <button
                 className="text-button password-toggle"
@@ -169,7 +234,7 @@ export function Login() {
                 aria-pressed={showPassword}
                 onClick={() => setShowPassword((visible) => !visible)}
               >
-                {showPassword ? 'Hide' : 'Show'}
+                {showPassword ? t('login_hide_pwd') : t('login_show_pwd')}
               </button>
             </div>
             {errors.password && (
@@ -188,7 +253,7 @@ export function Login() {
                 type="checkbox"
                 onChange={(event) => setRememberMe(event.target.checked)}
               />
-              <span>Remember me</span>
+              <span>{t('login_remember')}</span>
             </label>
           </div>
 
@@ -197,7 +262,7 @@ export function Login() {
             type="submit"
             disabled={isSubmitting}
           >
-            {isSubmitting ? 'Authenticating…' : 'Sign in to Workspace'}
+            {isSubmitting ? t('login_btn_submitting') : t('login_btn_submit')}
           </button>
 
           {statusMessage && (
@@ -208,10 +273,7 @@ export function Login() {
         </form>
 
         <p className="contact-note">
-          New to Project Green?{' '}
-          <span onClick={handleDemoFill} role="button" tabIndex={0} style={{ cursor: 'pointer' }}>
-            Try Demo Account
-          </span>
+          Project Green • Karnataka Bhoomi Land Portal
         </p>
       </section>
     </main>

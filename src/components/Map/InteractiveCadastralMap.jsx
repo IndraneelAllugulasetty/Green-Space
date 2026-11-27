@@ -1,3 +1,5 @@
+import { useState } from 'react';
+import { useLanguage } from '../../context/LanguageContext';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   MapContainer,
@@ -529,31 +531,25 @@ export function InteractiveCadastralMap({
         {!fullCanvas && selectedParcel && (
           <div className="map-parcel-popup">
             <div className="popup-header">
-              <div className="popup-badge">Selected Land Parcel</div>
-              <span className="popup-survey">Survey No. {selectedParcel.surveyNumber}</span>
+              <div className="popup-badge">✓ {t('details_lbl_verified')}</div>
+              <span className="popup-survey">{t('common_survey_no')} {selectedParcel.surveyNumber}</span>
             </div>
             <div className="popup-details">
               <div className="popup-row">
-                <span className="popup-label">Location:</span>
-                <span className="popup-val">
-                  {selectedParcel.village}, {selectedParcel.taluk}
-                </span>
+                <span className="popup-label">{t('common_village')}:</span>
+                <span className="popup-val">{selectedParcel.village}, {selectedParcel.taluk}, {selectedParcel.district}</span>
               </div>
               <div className="popup-row">
-                <span className="popup-label">Extent:</span>
+                <span className="popup-label">{t('common_extent')}:</span>
                 <span className="popup-val">{selectedParcel.extent.formatted}</span>
               </div>
               <div className="popup-row">
-                <span className="popup-label">Owner:</span>
+                <span className="popup-label">{t('common_owner')}:</span>
                 <span className="popup-val">{selectedParcel.ownerName}</span>
               </div>
               <div className="popup-row">
-                <span className="popup-label">GIS area:</span>
-                <span className="popup-val">
-                  {parcelRings.get(selectedParcel.id)
-                    ? formatArea(ringAreaSqMeters(parcelRings.get(selectedParcel.id))).label
-                    : 'No boundary'}
-                </span>
+                <span className="popup-label">{t('common_status')}:</span>
+                <span className="popup-val success-val">{selectedParcel.verificationBadge}</span>
               </div>
             </div>
           </div>
