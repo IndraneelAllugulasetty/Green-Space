@@ -1,12 +1,14 @@
 import { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigation } from '../../context/NavigationContext';
+import { useLanguage } from '../../context/LanguageContext';
 import { MOCK_LAND_PARCELS, DISTRICT_LIST, TALUK_MAP } from '../../data/mockLandData';
 import './PropertySale.css';
 
 export function PropertySale() {
   const { user } = useAuth();
   const { navigateTo, showToast } = useNavigation();
+  const { t } = useLanguage();
 
   // Stage 1 State: Land Verification
   const [district, setDistrict] = useState('Mysuru');
@@ -130,7 +132,7 @@ export function PropertySale() {
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
           2-Step Authenticated Land Listing Protocol
         </span>
-        <h1 className="sale-title">Upload Your Property for Sale</h1>
+        <h1 className="sale-title">{t('sale_title')}</h1>
         <p className="sale-subtitle">
           To protect buyers and eliminate fraud, Project Green requires automated cross-verification of your identity with the Government of Karnataka Bhoomi land records before listing.
         </p>
@@ -142,7 +144,7 @@ export function PropertySale() {
         <section className={`stage-card ${isUnlocked ? 'stage-completed' : 'stage-active'}`}>
           <div className="stage-header-row">
             <div className="stage-step-pill">
-              {isUnlocked ? '✓ Stage 1 Complete' : 'Stage 1: Identity & Land Title Verification'}
+              {isUnlocked ? '✓ ' + t('sale_step1_badge') : t('sale_step1_badge')}
             </div>
             {isUnlocked && <span className="verified-stamp">BHOOMI AUTHENTICATED</span>}
           </div>
@@ -153,29 +155,29 @@ export function PropertySale() {
 
           {/* Quick Demo Pre-fills for Testing */}
           <div className="testing-helpers-bar">
-            <span className="test-label">Quick Test Scenarios:</span>
+            <span className="test-label">Demo Shortcuts:</span>
             <button 
               type="button" 
               className="test-btn test-success"
               onClick={handleFillDemoOwnership}
-              title="Test successful owner verification (Survey 84/2A owned by Hasnain Ahmed)"
+              title="Test valid owner"
             >
-              ✓ Test Valid Owner (Survey 84/2A)
+              ✓ {t('sale_demo_valid')}
             </button>
             <button 
               type="button" 
               className="test-btn test-fail"
               onClick={handleFillMismatch}
-              title="Test fraud prevention (Survey 112/1B owned by Ramesh Gowda)"
+              title="Test mismatch"
             >
-              ✕ Test Owner Mismatch (Survey 112/1B)
+              ✕ {t('sale_demo_mismatch')}
             </button>
           </div>
 
           <form className="stage-form" onSubmit={handleVerifyOwnership}>
             <div className="form-grid-2">
               <div className="field-group">
-                <label htmlFor="sale-district">District</label>
+                <label htmlFor="sale-district">{t('common_district')}</label>
                 <select
                   id="sale-district"
                   value={district}
@@ -192,15 +194,15 @@ export function PropertySale() {
               </div>
 
               <div className="field-group">
-                <label htmlFor="sale-taluk">Taluk</label>
+                <label htmlFor="sale-taluk">{t('common_taluk')}</label>
                 <select
                   id="sale-taluk"
                   value={taluk}
                   onChange={(e) => setTaluk(e.target.value)}
                   disabled={isUnlocked}
                 >
-                  {TALUK_MAP[district]?.map((t) => (
-                    <option key={t} value={t}>{t}</option>
+                  {TALUK_MAP[district]?.map((tItem) => (
+                    <option key={tItem} value={tItem}>{tItem}</option>
                   ))}
                 </select>
               </div>
@@ -208,7 +210,7 @@ export function PropertySale() {
 
             <div className="form-grid-2">
               <div className="field-group">
-                <label htmlFor="sale-village">Village / Hobli</label>
+                <label htmlFor="sale-village">{t('common_village')} / Hobli</label>
                 <input
                   id="sale-village"
                   type="text"
@@ -221,7 +223,7 @@ export function PropertySale() {
               </div>
 
               <div className="field-group">
-                <label htmlFor="sale-survey">Survey Number &amp; Hissa</label>
+                <label htmlFor="sale-survey">{t('common_survey_no')}</label>
                 <input
                   id="sale-survey"
                   type="text"
@@ -245,7 +247,7 @@ export function PropertySale() {
                 className="verify-owner-btn"
                 disabled={isVerifying}
               >
-                {isVerifying ? 'Checking Bhoomi RTC Records…' : 'Authenticate Land Ownership with Bhoomi →'}
+                {isVerifying ? t('sale_btn_verifying') : t('sale_btn_verify')} →
               </button>
             ) : (
               <button
@@ -265,20 +267,20 @@ export function PropertySale() {
                 {verificationResult.status === 'MATCHED_SUCCESS' ? (
                   <>
                     <span className="result-icon-check">✓</span>
-                    <h4>Ownership Authenticated</h4>
+                    <h4>{t('sale_verified_title')}</h4>
                   </>
                 ) : (
                   <>
                     <span className="result-icon-fail">✕</span>
-                    <h4>Listing Blocked (Fraud Prevention)</h4>
+                    <h4>{t('sale_mismatch_title')}</h4>
                   </>
                 )}
               </div>
               <p className="result-text">{verificationResult.message}</p>
               {verificationResult.parcel && (
                 <div className="result-parcel-preview">
-                  <span><strong>Extent:</strong> {verificationResult.parcel.extent.formatted}</span>
-                  <span><strong>Classification:</strong> {verificationResult.parcel.landClassification}</span>
+                  <span><strong>{t('common_extent')}:</strong> {verificationResult.parcel.extent.formatted}</span>
+                  <span><strong>{t('common_class')}:</strong> {verificationResult.parcel.landClassification}</span>
                   <span><strong>Official Khata:</strong> {verificationResult.parcel.khataNumber}</span>
                 </div>
               )}
@@ -290,12 +292,12 @@ export function PropertySale() {
         <section className={`stage-card ${isUnlocked ? 'stage-active' : 'stage-locked'}`}>
           <div className="stage-header-row">
             <div className="stage-step-pill">
-              Stage 2: Property Pricing &amp; Marketplace Listing
+              {t('sale_step2_badge')}
             </div>
             {!isUnlocked && (
               <span className="locked-badge">
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                Locked (Requires Stage 1)
+                Locked (Requires Step 1)
               </span>
             )}
           </div>
@@ -309,7 +311,7 @@ export function PropertySale() {
           <form className="stage-form" onSubmit={handlePublishListing}>
             <div className="form-grid-2">
               <div className="field-group">
-                <label htmlFor="price-total">Total Asking Price (₹)</label>
+                <label htmlFor="price-total">{t('sale_lbl_total_price')}</label>
                 <input
                   id="price-total"
                   type="text"
@@ -322,7 +324,7 @@ export function PropertySale() {
               </div>
 
               <div className="field-group">
-                <label htmlFor="price-per-acre">Rate per Acre (₹)</label>
+                <label htmlFor="price-per-acre">{t('sale_lbl_price_acre')}</label>
                 <input
                   id="price-per-acre"
                   type="text"
@@ -337,7 +339,7 @@ export function PropertySale() {
 
             <div className="form-grid-2">
               <div className="field-group">
-                <label htmlFor="contact-phone">Contact Phone for Inquiries</label>
+                <label htmlFor="contact-phone">{t('sale_lbl_phone')}</label>
                 <input
                   id="contact-phone"
                   type="tel"
@@ -357,13 +359,13 @@ export function PropertySale() {
                     onChange={(e) => setIsNegotiable(e.target.checked)}
                     disabled={!isUnlocked}
                   />
-                  <span>Price is Open to Negotiation</span>
+                  <span>{t('sale_lbl_negotiable')}</span>
                 </label>
               </div>
             </div>
 
             <div className="field-group">
-              <label htmlFor="sale-description">Property Highlights &amp; Water/Road Access</label>
+              <label htmlFor="sale-description">{t('sale_lbl_desc')}</label>
               <textarea
                 id="sale-description"
                 rows={3}
@@ -380,7 +382,7 @@ export function PropertySale() {
               className="publish-sale-btn"
               disabled={!isUnlocked || isPublishing}
             >
-              {isPublishing ? 'Publishing to Marketplace…' : 'Publish Verified Land Listing ✓'}
+              {isPublishing ? t('sale_btn_publishing') : t('sale_btn_publish')} ✓
             </button>
           </form>
         </section>

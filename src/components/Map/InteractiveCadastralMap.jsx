@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useLanguage } from '../../context/LanguageContext';
 import './InteractiveCadastralMap.css';
 
 export function InteractiveCadastralMap({ 
@@ -8,6 +9,7 @@ export function InteractiveCadastralMap({
   userCoordinates = null,
   isLocating = false
 }) {
+  const { t } = useLanguage();
   const [zoomLevel, setZoomLevel] = useState(1);
   const [mapLayer, setMapLayer] = useState('cadastral'); // 'cadastral' | 'satellite'
   const [showBoundaries, setShowBoundaries] = useState(true);
@@ -42,17 +44,17 @@ export function InteractiveCadastralMap({
               type="button"
               className={`layer-btn ${mapLayer === 'cadastral' ? 'active' : ''}`}
               onClick={() => setMapLayer('cadastral')}
-              title="Cadastral Boundary View"
+              title={t('landing_layer_map')}
             >
-              Cadastral Map
+              {t('landing_layer_map')}
             </button>
             <button
               type="button"
               className={`layer-btn ${mapLayer === 'satellite' ? 'active' : ''}`}
               onClick={() => setMapLayer('satellite')}
-              title="Satellite Ortho Imagery"
+              title={t('landing_layer_satellite')}
             >
-              Satellite
+              {t('landing_layer_satellite')}
             </button>
           </div>
 
@@ -151,24 +153,24 @@ export function InteractiveCadastralMap({
         {selectedParcel && (
           <div className="map-parcel-popup">
             <div className="popup-header">
-              <div className="popup-badge">Identified Land Parcel</div>
-              <span className="popup-survey">Survey No. {selectedParcel.surveyNumber}</span>
+              <div className="popup-badge">✓ {t('details_lbl_verified')}</div>
+              <span className="popup-survey">{t('common_survey_no')} {selectedParcel.surveyNumber}</span>
             </div>
             <div className="popup-details">
               <div className="popup-row">
-                <span className="popup-label">Location:</span>
+                <span className="popup-label">{t('common_village')}:</span>
                 <span className="popup-val">{selectedParcel.village}, {selectedParcel.taluk}, {selectedParcel.district}</span>
               </div>
               <div className="popup-row">
-                <span className="popup-label">Extent:</span>
+                <span className="popup-label">{t('common_extent')}:</span>
                 <span className="popup-val">{selectedParcel.extent.formatted}</span>
               </div>
               <div className="popup-row">
-                <span className="popup-label">Owner (RTC):</span>
+                <span className="popup-label">{t('common_owner')}:</span>
                 <span className="popup-val">{selectedParcel.ownerName}</span>
               </div>
               <div className="popup-row">
-                <span className="popup-label">Bhoomi Status:</span>
+                <span className="popup-label">{t('common_status')}:</span>
                 <span className="popup-val success-val">{selectedParcel.verificationBadge}</span>
               </div>
             </div>

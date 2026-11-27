@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import { useNavigation } from '../../context/NavigationContext';
+import { useLanguage } from '../../context/LanguageContext';
 import { MOCK_LAND_PARCELS, DISTRICT_LIST, TALUK_MAP } from '../../data/mockLandData';
 import { InteractiveCadastralMap } from '../../components/Map/InteractiveCadastralMap';
 import './PropertySearch.css';
 
 export function PropertySearch() {
   const { navigateTo, selectedLand, setSelectedLand, showToast } = useNavigation();
+  const { t } = useLanguage();
 
   const [selectedDistrict, setSelectedDistrict] = useState('All');
   const [selectedTaluk, setSelectedTaluk] = useState('All');
@@ -80,9 +82,9 @@ export function PropertySearch() {
       {/* Search Header Banner */}
       <div className="search-page-header">
         <div>
-          <h1 className="search-title">Search &amp; Verify Land Properties</h1>
+          <h1 className="search-title">{t('search_header_title')}</h1>
           <p className="search-subtitle">
-            Query Karnataka Bhoomi cadastral boundaries by Survey Number or administrative hierarchy, and inspect verified parcels on the interactive map.
+            {t('search_header_sub')}
           </p>
         </div>
 
@@ -91,13 +93,13 @@ export function PropertySearch() {
           className="locate-gps-top-btn"
           onClick={handleCaptureGPS}
           disabled={isLocating}
-          title="Detect your device coordinates on the map"
+          title={t('search_btn_locate')}
         >
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
             <circle cx="12" cy="12" r="10"/>
             <circle cx="12" cy="12" r="4"/>
           </svg>
-          {isLocating ? 'Locating Position…' : 'Locate My Position on Map'}
+          {isLocating ? t('search_btn_locating') : t('search_btn_locate')}
         </button>
       </div>
 
@@ -107,11 +109,11 @@ export function PropertySearch() {
         <div className="search-left-panel">
           {/* Filter by Survey Number & Hierarchy */}
           <div className="search-filter-card">
-            <h3 className="filter-card-title">Filter by Administrative Hierarchy</h3>
+            <h3 className="filter-card-title">{t('search_header_title')}</h3>
 
             <div className="filter-fields-row">
               <div className="filter-field">
-                <label htmlFor="district-select">District</label>
+                <label htmlFor="district-select">{t('search_filter_district')}</label>
                 <select
                   id="district-select"
                   value={selectedDistrict}
@@ -120,7 +122,7 @@ export function PropertySearch() {
                     setSelectedTaluk('All');
                   }}
                 >
-                  <option value="All">All Karnataka Districts</option>
+                  <option value="All">{t('common_all')} {t('search_filter_district')}s</option>
                   {DISTRICT_LIST.map((dist) => (
                     <option key={dist} value={dist}>{dist}</option>
                   ))}
@@ -128,14 +130,14 @@ export function PropertySearch() {
               </div>
 
               <div className="filter-field">
-                <label htmlFor="taluk-select">Taluk</label>
+                <label htmlFor="taluk-select">{t('search_filter_taluk')}</label>
                 <select
                   id="taluk-select"
                   value={selectedTaluk}
                   onChange={(e) => setSelectedTaluk(e.target.value)}
                   disabled={selectedDistrict === 'All'}
                 >
-                  <option value="All">All Taluks</option>
+                  <option value="All">{t('common_all')} {t('search_filter_taluk')}s</option>
                   {selectedDistrict !== 'All' && TALUK_MAP[selectedDistrict]?.map((taluk) => (
                     <option key={taluk} value={taluk}>{taluk}</option>
                   ))}
@@ -144,12 +146,12 @@ export function PropertySearch() {
             </div>
 
             <div className="filter-field">
-              <label htmlFor="survey-input">Survey Number, Village or Owner Name</label>
+              <label htmlFor="survey-input">{t('search_filter_survey')}</label>
               <div className="search-input-wrap">
                 <input
                   id="survey-input"
                   type="text"
-                  placeholder="e.g. 84/2A, Channapura, Hasnain..."
+                  placeholder={t('search_filter_survey_placeholder')}
                   value={surveyQuery}
                   onChange={(e) => setSurveyQuery(e.target.value)}
                 />
@@ -171,9 +173,9 @@ export function PropertySearch() {
           <div className="search-results-container">
             <div className="results-header-bar">
               <span className="results-count">
-                <strong>{filteredParcels.length}</strong> Land Parcels Found
+                <strong>{filteredParcels.length}</strong> {t('search_parcels_count')}
               </span>
-              <span className="results-tip">Click a parcel to view on map</span>
+              <span className="results-tip">✓ {t('search_verified_badge')}</span>
             </div>
 
             <div className="results-list">
@@ -192,7 +194,7 @@ export function PropertySearch() {
 
                       <div className="item-body">
                         <div className="item-top">
-                          <span className="item-survey">Survey No. {parcel.surveyNumber}</span>
+                          <span className="item-survey">{t('common_survey_no')} {parcel.surveyNumber}</span>
                           <span className="item-extent">{parcel.extent.formatted}</span>
                         </div>
 
@@ -201,7 +203,7 @@ export function PropertySearch() {
                         </p>
 
                         <div className="item-meta-row">
-                          <span className="item-owner">Owner: {parcel.ownerName}</span>
+                          <span className="item-owner">{t('common_owner')}: {parcel.ownerName}</span>
                           <span className="item-class-tag">{parcel.landClassification.split(' ')[0]}</span>
                         </div>
 
@@ -214,7 +216,7 @@ export function PropertySearch() {
                               handleInspectDetails(parcel);
                             }}
                           >
-                            Inspect Full Land Details →
+                            {t('search_btn_inspect')} →
                           </button>
                         </div>
                       </div>
@@ -223,7 +225,7 @@ export function PropertySearch() {
                 })
               ) : (
                 <div className="empty-results-box">
-                  <p className="empty-title">No matching land parcels found</p>
+                  <p className="empty-title">{t('search_no_results')}</p>
                   <p className="empty-sub">
                     Try adjusting your search criteria, selecting &apos;All Districts&apos;, or resetting filters.
                   </p>

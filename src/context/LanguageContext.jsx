@@ -1,31 +1,62 @@
 import { createContext, useContext, useState, useEffect } from 'react';
-import { TRANSLATIONS } from '../data/translations';
+import { TRANSLATIONS, SUPPORTED_LANGUAGES } from '../data/translations';
 
 const LanguageContext = createContext(null);
 
 export function LanguageProvider({ children }) {
   const [lang, setLang] = useState(() => {
     try {
-      return localStorage.getItem('project_green_lang') || 'en';
+      const saved = localStorage.getItem('project_green_lang');
+      const isValid = SUPPORTED_LANGUAGES.some((l) => l.code === saved);
+      return isValid ? saved : 'en';
     } catch {
       return 'en';
     }
   });
 
   useEffect(() => {
-    localStorage.setItem('project_green_lang', lang);
+    try {
+      localStorage.setItem('project_green_lang', lang);
+    } catch {
+      // LocalStorage access fallback
+    }
   }, [lang]);
 
-  function toggleLanguage() {
-    setLang((prev) => (prev === 'en' ? 'kn' : 'en'));
+  // Set language directly by code
+  function setLanguage(langCode) {
+    if (SUPPORTED_LANGUAGES.some((l) => l.code === langCode)) {
+      setLang(langCode);
+    }
   }
 
-  function t(key) {
-    return TRANSLATIONS[lang]?.[key] || TRANSLATIONS.en[key] || key;
+  // Cycle through supported languages
+  function toggleLanguage() {
+    setLang((prev) => {
+      const index = SUPPORTED_LANGUAGES.findIndex((l) => l.code === prev);
+      const nextIndex = (index + 1) % SUPPORTED_LANGUAGES.length;
+      return SUPPORTED_LANGUAGES[nextIndex].code;
+    });
   }
+
+  // Translation helper with English fallback
+  function t(key, fallback = '') {
+    if (!key) return '';
+    return TRANSLATIONS[lang]?.[key] || TRANSLATIONS.en?.[key] || fallback || key;
+  }
+
+  const activeLanguageObj = SUPPORTED_LANGUAGES.find((l) => l.code === lang) || SUPPORTED_LANGUAGES[0];
 
   return (
-    <LanguageContext.Provider value={{ lang, toggleLanguage, t }}>
+    <LanguageContext.Provider
+      value={{
+        lang,
+        setLanguage,
+        toggleLanguage,
+        t,
+        languages: SUPPORTED_LANGUAGES,
+        activeLanguage: activeLanguageObj
+      }}
+    >
       {children}
     </LanguageContext.Provider>
   );

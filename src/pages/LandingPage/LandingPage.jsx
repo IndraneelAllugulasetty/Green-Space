@@ -9,7 +9,7 @@ import './LandingPage.css';
 export function LandingPage() {
   const { navigateTo, setSelectedLand, showToast } = useNavigation();
   const { user, isAuthenticated, login, logout } = useAuth();
-  const { lang, toggleLanguage } = useLanguage();
+  const { lang, setLanguage, languages, activeLanguage, t } = useLanguage();
 
   // Map state matching https://www.google.com/maps/@12.336655,76.5677671,13z
   const [zoomLevel, setZoomLevel] = useState(13);
@@ -19,6 +19,7 @@ export function LandingPage() {
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [selectedParcel, setLocalSelectedParcel] = useState(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isLangMenuOpen, setIsLangMenuOpen] = useState(false);
   const [userGpsCoords, setUserGpsCoords] = useState(null);
   const [isLocating, setIsLocating] = useState(false);
   const [showCertificateModal, setShowCertificateModal] = useState(false);
@@ -81,9 +82,8 @@ export function LandingPage() {
         },
         () => {
           setIsLocating(false);
-          // Centered around the user's Google Maps link location (Mysuru/KRS/Bilikere)
           setUserGpsCoords({ lat: 12.336655, lng: 76.5677671, accuracy: 4 });
-          showToast('GPS Locked to Mysuru / Bilikere Cadastral Zone', 'info');
+          showToast(t('landing_gps_locked'), 'info');
         },
         { enableHighAccuracy: true, timeout: 5000 }
       );
@@ -94,8 +94,8 @@ export function LandingPage() {
   }
 
   return (
-    <div className="gmaps-viewport">
-      {/* 1. FULL-SCREEN BLANK CANVAS (Container ready for live map integration) */}
+    <div className="gmaps-viewport" onClick={() => isLangMenuOpen && setIsLangMenuOpen(false)}>
+      {/* 1. FULL-SCREEN BLANK CANVAS (Container ready for friend's live map integration) */}
       <div id="live-map-container" className="gmaps-canvas live-map-blank">
         {/* Blank viewport canvas reserved for live map mounting */}
       </div>
@@ -119,7 +119,7 @@ export function LandingPage() {
           <input
             type="text"
             className="gmaps-search-input"
-            placeholder={lang === 'en' ? 'Search Survey No, Village, or Taluk...' : 'ಸರ್ವೆ ನಂಬರ್, ಗ್ರಾಮ ಹುಡುಕಿ...'}
+            placeholder={t('landing_search_placeholder')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             onFocus={() => setIsSearchFocused(true)}
@@ -155,28 +155,28 @@ export function LandingPage() {
             className={`chip-btn ${activeCategory === 'all' ? 'active' : ''}`}
             onClick={() => setActiveCategory('all')}
           >
-            🌾 {lang === 'en' ? 'All Lands' : 'ಎಲ್ಲಾ ಜಮೀನು'}
+            🌾 {t('landing_chip_all')}
           </button>
           <button
             type="button"
             className={`chip-btn ${activeCategory === 'agricultural' ? 'active' : ''}`}
             onClick={() => setActiveCategory('agricultural')}
           >
-            🚜 {lang === 'en' ? 'Agricultural' : 'ಕೃಷಿ ಜಮೀನು'}
+            🚜 {t('landing_chip_agri')}
           </button>
           <button
             type="button"
             className={`chip-btn ${activeCategory === 'plantation' ? 'active' : ''}`}
             onClick={() => setActiveCategory('plantation')}
           >
-            ☕ {lang === 'en' ? 'Plantation' : 'ತೋಟಗಾರಿಕೆ'}
+            ☕ {t('landing_chip_plantation')}
           </button>
           <button
             type="button"
             className={`chip-btn ${activeCategory === 'commercial' ? 'active' : ''}`}
             onClick={() => setActiveCategory('commercial')}
           >
-            🏢 {lang === 'en' ? 'DC Converted' : 'ವಾಣಿಜ್ಯ ಪರಿವರ್ತಿತ'}
+            🏢 {t('landing_chip_commercial')}
           </button>
         </div>
 
@@ -184,9 +184,9 @@ export function LandingPage() {
         {(isSearchFocused || searchQuery.trim()) && (
           <div className="gmaps-search-results-dropdown">
             <div className="dropdown-header">
-              <span>{matchingParcels.length} Verified Land Parcels Found</span>
+              <span>{matchingParcels.length} {t('landing_results_found')}</span>
               <button type="button" className="close-dropdown-btn" onClick={() => setIsSearchFocused(false)}>
-                Hide
+                {t('landing_btn_hide')}
               </button>
             </div>
             {matchingParcels.map((parcel) => (
@@ -239,7 +239,7 @@ export function LandingPage() {
               </p>
               <div className="sheet-rating-row">
                 <span className="sheet-rating-star">★ 4.9</span>
-                <span className="sheet-verified-pill">Bhoomi Cadastre Clean Title</span>
+                <span className="sheet-verified-pill">{t('landing_rating_badge')}</span>
               </div>
             </div>
 
@@ -251,7 +251,7 @@ export function LandingPage() {
                 onClick={() => handleInspectFullDossier(selectedParcel)}
               >
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-                Full Dossier
+                {t('landing_btn_dossier')}
               </button>
 
               <button
@@ -259,7 +259,7 @@ export function LandingPage() {
                 className="sheet-pill-btn"
                 onClick={() => setShowCertificateModal(true)}
               >
-                📜 Title Certificate
+                📜 {t('landing_btn_cert')}
               </button>
 
               <button
@@ -267,10 +267,10 @@ export function LandingPage() {
                 className="sheet-pill-btn"
                 onClick={() => {
                   navigator.clipboard?.writeText(window.location.href);
-                  showToast('Parcel share link copied to clipboard!', 'info');
+                  showToast(t('landing_share_copied'), 'info');
                 }}
               >
-                🔗 Share
+                🔗 {t('landing_btn_share')}
               </button>
             </div>
 
@@ -279,7 +279,7 @@ export function LandingPage() {
               <div className="sheet-row">
                 <span className="row-icon">👤</span>
                 <div className="row-text">
-                  <span className="row-title">Recorded Title Holder (RTC)</span>
+                  <span className="row-title">{t('landing_owner_label')}</span>
                   <strong className="row-val highlight-green">{selectedParcel.ownerName}</strong>
                 </div>
               </div>
@@ -287,7 +287,7 @@ export function LandingPage() {
               <div className="sheet-row">
                 <span className="row-icon">📐</span>
                 <div className="row-text">
-                  <span className="row-title">Total Measured Extent</span>
+                  <span className="row-title">{t('landing_extent_label')}</span>
                   <span className="row-val">{selectedParcel.extent.formatted}</span>
                 </div>
               </div>
@@ -295,7 +295,7 @@ export function LandingPage() {
               <div className="sheet-row">
                 <span className="row-icon">🌱</span>
                 <div className="row-text">
-                  <span className="row-title">Land Classification</span>
+                  <span className="row-title">{t('landing_class_label')}</span>
                   <span className="row-val">{selectedParcel.landClassification}</span>
                 </div>
               </div>
@@ -303,7 +303,7 @@ export function LandingPage() {
               <div className="sheet-row">
                 <span className="row-icon">📑</span>
                 <div className="row-text">
-                  <span className="row-title">Official Khata &amp; Mutation</span>
+                  <span className="row-title">{t('landing_khata_label')}</span>
                   <span className="row-val code-font">{selectedParcel.khataNumber} • {selectedParcel.mutationStatus.split(' ')[0]}</span>
                 </div>
               </div>
@@ -311,7 +311,7 @@ export function LandingPage() {
               <div className="sheet-row">
                 <span className="row-icon">🛡️</span>
                 <div className="row-text">
-                  <span className="row-title">Encumbrance &amp; Legal Clearance</span>
+                  <span className="row-title">{t('landing_encumbrance_label')}</span>
                   <span className="row-val success-font">{selectedParcel.encumbranceStatus}</span>
                 </div>
               </div>
@@ -319,7 +319,7 @@ export function LandingPage() {
               <div className="sheet-row">
                 <span className="row-icon">🛣️</span>
                 <div className="row-text">
-                  <span className="row-title">Road Frontage &amp; Access</span>
+                  <span className="row-title">{t('landing_road_label')}</span>
                   <span className="row-val">{selectedParcel.roadApproach}</span>
                 </div>
               </div>
@@ -331,7 +331,7 @@ export function LandingPage() {
                 className="sheet-view-dossier-large"
                 onClick={() => handleInspectFullDossier(selectedParcel)}
               >
-                Inspect Official Bhoomi Dossier →
+                {t('landing_inspect_action')}
               </button>
             </div>
           </div>
@@ -340,16 +340,42 @@ export function LandingPage() {
 
       {/* 4. GOOGLE MAPS FLOATING CONTROLS (TOP-RIGHT) */}
       <div className="gmaps-top-right-controls">
-        {/* Language Switcher Pill */}
-        <button
-          type="button"
-          className="gmaps-ctrl-pill"
-          onClick={toggleLanguage}
-          title={lang === 'en' ? 'ಕನ್ನಡಕ್ಕೆ ಬದಲಾಯಿಸಿ' : 'Switch to English'}
-        >
-          <span>🌐</span>
-          <span>{lang === 'en' ? 'ಕನ್ನಡ' : 'English'}</span>
-        </button>
+        {/* Multi-Language Dropdown Selector */}
+        <div className="gmaps-lang-dropdown-wrap" onClick={(e) => e.stopPropagation()}>
+          <button
+            type="button"
+            className="gmaps-ctrl-pill lang-pill"
+            onClick={() => setIsLangMenuOpen(!isLangMenuOpen)}
+            title="Change Language / ಭಾಷೆ / भाषा"
+            aria-label="Change Language"
+            aria-expanded={isLangMenuOpen}
+          >
+            <span>🌐</span>
+            <span>{activeLanguage?.native || 'English'}</span>
+            <span className="lang-arrow-icon">▾</span>
+          </button>
+
+          {isLangMenuOpen && (
+            <div className="gmaps-lang-menu" role="menu">
+              {languages.map((item) => (
+                <button
+                  key={item.code}
+                  type="button"
+                  className={`gmaps-lang-item ${lang === item.code ? 'active' : ''}`}
+                  onClick={() => {
+                    setLanguage(item.code);
+                    setIsLangMenuOpen(false);
+                  }}
+                  role="menuitem"
+                >
+                  <span className="lang-item-native">{item.native}</span>
+                  <span className="lang-item-label">({item.label})</span>
+                  {lang === item.code && <span className="lang-item-check">✓</span>}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
 
         {/* Sell Land Quick Trigger */}
         <button
@@ -364,7 +390,7 @@ export function LandingPage() {
           title="Authenticate and list property for sale"
         >
           <span>🏷️</span>
-          <span>{lang === 'en' ? 'Sell Land' : 'ಮಾರಾಟ'}</span>
+          <span>{t('landing_btn_sell')}</span>
         </button>
 
         {/* Sign In / User Profile */}
@@ -379,7 +405,7 @@ export function LandingPage() {
                 showToast('Signed out of Project Green session', 'info');
               }}
             >
-              Exit
+              {t('landing_btn_exit')}
             </button>
           </div>
         ) : (
@@ -390,14 +416,14 @@ export function LandingPage() {
               onClick={handleQuickDemoSign}
               title="One-click test account"
             >
-              Demo Auto-Sign
+              {t('landing_btn_demo')}
             </button>
             <button
               type="button"
               className="gmaps-signin-btn"
               onClick={() => navigateTo('login')}
             >
-              Sign In
+              {t('landing_btn_signin')}
             </button>
           </div>
         )}
@@ -413,7 +439,7 @@ export function LandingPage() {
           title="Switch Map Layers (Satellite / Terrain)"
         >
           <div className={`thumbnail-inner ${mapMode === 'satellite' ? 'thumb-satellite' : 'thumb-terrain'}`}>
-            <span className="layer-mode-title">{mapMode === 'satellite' ? 'Map' : 'Satellite'}</span>
+            <span className="layer-mode-title">{mapMode === 'satellite' ? t('landing_layer_map') : t('landing_layer_satellite')}</span>
           </div>
         </button>
 
@@ -460,11 +486,11 @@ export function LandingPage() {
       {/* 6. GOOGLE MAPS BOTTOM SCALE BAR & COORDINATES */}
       <div className="gmaps-bottom-bar">
         <span className="gmaps-coord-readout">
-          12.336655° N, 76.567767° E • Zoom {zoomLevel}z • Karnataka Cadastre WGS84
+          12.336655° N, 76.567767° E • Zoom {zoomLevel}z • {t('landing_coord_suffix')}
         </span>
         <div className="gmaps-scale-meter">
           <span className="scale-bracket"></span>
-          <span className="scale-label">500 m</span>
+          <span className="scale-label">{t('landing_scale_label')}</span>
         </div>
       </div>
 
@@ -475,7 +501,7 @@ export function LandingPage() {
             <div className="drawer-header">
               <div className="drawer-brand">
                 <span className="brand-leaf-icon">🌱</span>
-                <strong>PROJECT GREEN</strong>
+                <strong>{t('brand_title')}</strong>
               </div>
               <button type="button" className="drawer-close" onClick={() => setIsMenuOpen(false)}>
                 &times;
@@ -491,7 +517,7 @@ export function LandingPage() {
                   navigateTo('search');
                 }}
               >
-                📍 Search &amp; Verify Land Workspace
+                {t('landing_drawer_search')}
               </button>
 
               <button
@@ -503,17 +529,17 @@ export function LandingPage() {
                   navigateTo('upload-sale');
                 }}
               >
-                🏷️ Upload Property for Sale (2-Step Bhoomi Check)
+                {t('landing_drawer_sell')}
               </button>
 
               <div className="drawer-divider" />
 
               <div className="drawer-info-block">
-                <h5>Integrated Karnataka Portals</h5>
+                <h5>{t('landing_drawer_portals')}</h5>
                 <ul>
-                  <li>Bhoomi RTC Revenue Records</li>
-                  <li>Mojini Cadastral Spatial Surveys</li>
-                  <li>Kaveri-2 Encumbrance Index</li>
+                  <li>{t('landing_drawer_bhoomi')}</li>
+                  <li>{t('landing_drawer_mojini')}</li>
+                  <li>{t('landing_drawer_kaveri')}</li>
                 </ul>
               </div>
             </div>

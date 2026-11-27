@@ -560,6 +560,73 @@
   box-shadow: 0 3px 8px rgba(60, 64, 67, 0.24);
 }
 
+/* Multi-Language Dropdown Menu */
+.gmaps-lang-dropdown-wrap {
+  position: relative;
+}
+
+.lang-arrow-icon {
+  font-size: 11px;
+  color: #70757a;
+  margin-left: 2px;
+}
+
+.gmaps-lang-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(60, 64, 67, 0.25), 0 0 2px rgba(60, 64, 67, 0.15);
+  padding: 6px;
+  min-width: 170px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  z-index: 50;
+  animation: fadeInDown 0.15s ease;
+}
+
+.gmaps-lang-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  text-align: left;
+  transition: background-color 0.12s ease;
+}
+
+.gmaps-lang-item:hover {
+  background-color: #f1f3f4;
+}
+
+.gmaps-lang-item.active {
+  background-color: #e8f0fe;
+}
+
+.lang-item-native {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #202124;
+}
+
+.lang-item-label {
+  font-size: 11.5px;
+  color: #5f6368;
+  margin-left: 6px;
+}
+
+.lang-item-check {
+  font-size: 13px;
+  font-weight: 700;
+  color: #1a73e8;
+  margin-left: auto;
+}
+
 .gmaps-ctrl-pill.sell-pill {
   color: #0d652d;
   background: #edf7ee;
