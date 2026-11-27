@@ -4,11 +4,27 @@
 const { FreshnessPolicy } = require('../../domain/freshness');
 
 class ParcelController {
-  constructor({ syncService, parcelRepository, jobQueue, cacheService }) {
+  constructor({ syncService, parcelRepository, jobQueue, cacheService, adapterRegistry = null }) {
     this.syncService = syncService;
     this.parcelRepo = parcelRepository;
     this.jobQueue = jobQueue;
     this.cacheService = cacheService;
+    this.adapterRegistry = adapterRegistry;
+  }
+
+  async listParcels(req, res) {
+    try {
+      const parcels = this.parcelRepo.listActiveParcelsWithGeometry();
+      const records = parcels
+        .map((p) => this.parcelRepo.getLatestRecord(p.id))
+        .filter(Boolean);
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ total: records.length, parcels: records }, null, 2));
+    } catch (err) {
+      console.error('[API] listParcels error:', err);
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'INTERNAL_ERROR', message: err.message }));
+    }
   }
 
   async getParcel(req, res, { parcelId }) {
@@ -184,6 +200,133 @@ class ParcelController {
       }, null, 2));
     } catch (err) {
       console.error('[API] lookup error:', err);
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'INTERNAL_ERROR', message: err.message }));
+    }
+  }
+
+  async lookupByLocation(req, res, params, url, body) {
+    try {
+      if (!body || body.lat === undefined || body.lng === undefined) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({
+          error: 'INVALID_INPUT',
+          message: 'Latitude (lat) and longitude (lng) are required.'
+        }));
+        return;
+      }
+
+      const lat = Number(body.lat);
+      const lng = Number(body.lng);
+      const accuracyMeters = body.accuracyMeters ?? null;
+      const maxDistanceMeters = body.maxDistanceMeters ?? 2000;
+
+      const repoResult = await this.syncService.resolveByLocation({
+        lat,
+        lng,
+        accuracyMeters,
+        maxDistanceMeters
+      });
+
+      if (repoResult.status === 'INVALID_COORDINATES') {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({
+          error: 'INVALID_COORDINATES',
+          message: repoResult.message
+        }));
+        return;
+      }
+
+      if (repoResult.found) {
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({
+          status: repoResult.status,
+          confidence: repoResult.confidence,
+          insideBoundary: repoResult.insideBoundary,
+          distanceMeters: repoResult.distanceMeters,
+          message: repoResult.message,
+          validation: repoResult.validation,
+          parcel: repoResult.parcel,
+          latestVersion: repoResult.latestVersion,
+          freshness: repoResult.freshness,
+          sourceOfData: repoResult.sourceOfData
+        }, null, 2));
+        return;
+      }
+
+      // Check configured source adapter if not yet persisted in local repository
+      const adapter = this.adapterRegistry?.getDefault?.();
+      let remoteMatch = null;
+      if (adapter && typeof adapter.findByCoordinates === 'function') {
+        remoteMatch = adapter.findByCoordinates({
+          lat,
+          lng,
+          accuracyMeters,
+          maxDistanceMeters
+        });
+
+        if (remoteMatch.matched) {
+          const parcelParams = {
+            officialId: remoteMatch.matched.officialId,
+            state: remoteMatch.matched.state,
+            district: remoteMatch.matched.district,
+            taluk: remoteMatch.matched.taluk,
+            hobli: remoteMatch.matched.hobli,
+            village: remoteMatch.matched.village,
+            surveyNumber: remoteMatch.matched.surveyNumber,
+            hissa: remoteMatch.matched.hissa
+          };
+
+          const resolved = await this.syncService.resolveParcel(parcelParams);
+          if (resolved.found) {
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({
+              status: remoteMatch.status,
+              confidence: remoteMatch.confidence,
+              insideBoundary: remoteMatch.insideBoundary,
+              distanceMeters: remoteMatch.distanceMeters,
+              message: remoteMatch.message,
+              validation: remoteMatch.validation,
+              parcel: resolved.parcel,
+              latestVersion: resolved.latestVersion,
+              freshness: resolved.freshness,
+              sourceOfData: resolved.sourceOfData
+            }, null, 2));
+            return;
+          }
+
+          const enqueueResult = this.jobQueue.enqueue({
+            parcelId: resolved.parcelId,
+            parcelParams,
+            sourceId: adapter.id,
+            triggerType: 'INITIAL_LOOKUP',
+            priority: 10
+          });
+
+          res.writeHead(202, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({
+            status: 'FETCH_DISPATCHED',
+            spatialStatus: remoteMatch.status,
+            confidence: remoteMatch.confidence,
+            distanceMeters: remoteMatch.distanceMeters,
+            parcelId: resolved.parcelId,
+            jobId: enqueueResult.jobId,
+            message: 'Parcel matched by live location. Background fetch initiated from cadastral source.'
+          }, null, 2));
+          return;
+        }
+      }
+
+      const finalMiss = remoteMatch || repoResult;
+      res.writeHead(404, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({
+        status: finalMiss.status || 'OUTSIDE_COVERAGE',
+        confidence: 'NONE',
+        message: finalMiss.message || 'No matching parcel found for supplied location.',
+        distanceMeters: finalMiss.distanceMeters ?? null
+      }, null, 2));
+    } catch (err) {
+      console.error('[API] lookupByLocation error:', err);
       res.writeHead(500, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ error: 'INTERNAL_ERROR', message: err.message }));
     }

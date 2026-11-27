@@ -53,6 +53,16 @@ class ParcelRepository {
     return row ? this.mapParcel(row) : null;
   }
 
+  listActiveParcelsWithGeometry() {
+    const stmt = this.db.prepare(`
+      SELECT p.*, s.name as latest_source_name
+      FROM parcels p
+      LEFT JOIN data_sources s ON p.latest_source_id = s.id
+      WHERE p.status = 'ACTIVE' AND p.geometry IS NOT NULL
+    `);
+    return stmt.all().map((row) => this.mapParcel(row));
+  }
+
   getLatestRecord(parcelId) {
     const stmt = this.db.prepare(`
       SELECT 
