@@ -1,10 +1,27 @@
-import { useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigation } from '../../context/NavigationContext';
 import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
 import { MOCK_LAND_PARCELS, DEMO_USER } from '../../data/mockLandData';
 import { VerificationCertificate } from '../../components/Certificate/VerificationCertificate';
+import { InteractiveCadastralMap } from '../../components/Map/InteractiveCadastralMap';
+import { landApiService } from '../../services/api';
+import { describeParcel, formatDistance, toDms, toUtm } from '../../gis/geo';
 import './LandingPage.css';
+
+const ZOOM_SCALE_LABELS = {
+  8: '20 km',
+  9: '10 km',
+  10: '5 km',
+  11: '2 km',
+  12: '1 km',
+  13: '500 m',
+  14: '250 m',
+  15: '100 m',
+  16: '50 m',
+  17: '25 m',
+  18: '10 m'
+};
 
 export function LandingPage() {
   const { navigateTo, setSelectedLand, showToast } = useNavigation();
@@ -22,35 +39,103 @@ export function LandingPage() {
   const [isLangMenuOpen, setIsLangMenuOpen] = useState(false);
   const [userGpsCoords, setUserGpsCoords] = useState(null);
   const [isLocating, setIsLocating] = useState(false);
+  const [isWatchingGps, setIsWatchingGps] = useState(false);
+  const [locationMatch, setLocationMatch] = useState(null);
+  const [gpsError, setGpsError] = useState(null);
+  const [viewportCenter, setViewportCenter] = useState({ lat: 12.336655, lng: 76.5677671 });
+  const [cursorCoords, setCursorCoords] = useState(null);
+  const [flyTarget, setFlyTarget] = useState(null);
   const [showCertificateModal, setShowCertificateModal] = useState(false);
 
+  const watchIdRef = useRef(null);
+
+  useEffect(() => {
+    return () => {
+      if (watchIdRef.current !== null && 'geolocation' in navigator) {
+        navigator.geolocation.clearWatch(watchIdRef.current);
+      }
+    };
+  }, []);
+
   // Filter parcels based on search input and active category chip
-  const matchingParcels = MOCK_LAND_PARCELS.filter((p) => {
-    if (activeCategory === 'agricultural' && !p.landClassification.includes('Agricultural')) {
-      return false;
+  const matchingParcels = useMemo(() => {
+    return MOCK_LAND_PARCELS.filter((p) => {
+      if (activeCategory === 'agricultural' && !p.landClassification.includes('Agricultural')) {
+        return false;
+      }
+      if (activeCategory === 'plantation' && !p.landClassification.includes('Plantation')) {
+        return false;
+      }
+      if (activeCategory === 'commercial' && !p.landClassification.includes('Commercial')) {
+        return false;
+      }
+      if (searchQuery.trim()) {
+        const q = searchQuery.toLowerCase();
+        const matchSurvey = p.surveyNumber.toLowerCase().includes(q);
+        const matchVillage = p.village.toLowerCase().includes(q);
+        const matchTaluk = p.taluk.toLowerCase().includes(q);
+        const matchDistrict = p.district.toLowerCase().includes(q);
+        const matchOwner = p.ownerName.toLowerCase().includes(q);
+        return matchSurvey || matchVillage || matchTaluk || matchDistrict || matchOwner;
+      }
+      return true;
+    });
+  }, [activeCategory, searchQuery]);
+
+  const selectedParcelSpatial = useMemo(
+    () => (selectedParcel?.coordinates ? describeParcel(selectedParcel) : null),
+    [selectedParcel]
+  );
+
+  async function resolveLiveCoordinate(coords, { openSheet = true, silentToast = false } = {}) {
+    setUserGpsCoords(coords);
+    setGpsError(null);
+    setZoomLevel(17);
+    setFlyTarget({ lat: coords.lat, lng: coords.lng, zoom: 17, token: Date.now() });
+
+    try {
+      const result = await landApiService.verifyCoordinates(
+        coords.lat,
+        coords.lng,
+        coords.accuracyRadiusMeters
+      );
+      setLocationMatch(result);
+
+      if (result.matchedParcel && openSheet) {
+        setLocalSelectedParcel(result.matchedParcel);
+        setSelectedLand(result.matchedParcel);
+      } else if (!result.matchedParcel && openSheet) {
+        setLocalSelectedParcel(null);
+      }
+
+      if (!silentToast) {
+        if (result.status === 'EXACT_BOUNDARY_MATCH') {
+          showToast(
+            `Parcel identified: Survey No. ${result.matchedParcel.surveyNumber} (${result.matchedParcel.village})`,
+            'success'
+          );
+        } else {
+          showToast(result.message, 'info');
+        }
+      }
+    } catch (err) {
+      showToast(err.message || 'Could not resolve land parcel for coordinates.', 'error');
     }
-    if (activeCategory === 'plantation' && !p.landClassification.includes('Plantation')) {
-      return false;
-    }
-    if (activeCategory === 'commercial' && !p.landClassification.includes('Commercial')) {
-      return false;
-    }
-    if (searchQuery.trim()) {
-      const q = searchQuery.toLowerCase();
-      const matchSurvey = p.surveyNumber.toLowerCase().includes(q);
-      const matchVillage = p.village.toLowerCase().includes(q);
-      const matchTaluk = p.taluk.toLowerCase().includes(q);
-      const matchDistrict = p.district.toLowerCase().includes(q);
-      const matchOwner = p.ownerName.toLowerCase().includes(q);
-      return matchSurvey || matchVillage || matchTaluk || matchDistrict || matchOwner;
-    }
-    return true;
-  });
+  }
 
   function handleSelectParcel(parcel) {
     setLocalSelectedParcel(parcel);
     setSelectedLand(parcel);
     setIsSearchFocused(false);
+    if (parcel?.coordinates) {
+      setZoomLevel(17);
+      setFlyTarget({
+        lat: Number(parcel.coordinates.lat),
+        lng: Number(parcel.coordinates.lng),
+        zoom: 17,
+        token: Date.now()
+      });
+    }
   }
 
   function handleInspectFullDossier(parcel) {
@@ -67,37 +152,147 @@ export function LandingPage() {
   }
 
   function handleLocateGps() {
+    if (!('geolocation' in navigator)) {
+      setGpsError('Browser Geolocation API is unavailable. Use Simulate Field Location below.');
+      showToast('Device geolocation is not supported in this browser.', 'error');
+      return;
+    }
+
     setIsLocating(true);
-    if ('geolocation' in navigator) {
-      navigator.geolocation.getCurrentPosition(
-        (pos) => {
-          setIsLocating(false);
-          const coords = {
+    setGpsError(null);
+
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setIsLocating(false);
+        const accuracy = Math.round(pos.coords.accuracy || 10);
+        resolveLiveCoordinate({
+          lat: pos.coords.latitude,
+          lng: pos.coords.longitude,
+          accuracyRadiusMeters: accuracy,
+          timestamp: Date.now(),
+          isSimulated: false
+        });
+      },
+      (err) => {
+        setIsLocating(false);
+        setGpsError(
+          err?.message ||
+            'Location access denied or unavailable. You can simulate a Karnataka field position to test.'
+        );
+        showToast('Could not read device GPS. Use Simulate Field GPS or tap a parcel on the map.', 'error');
+      },
+      { enableHighAccuracy: true, timeout: 8000, maximumAge: 0 }
+    );
+  }
+
+  function handleToggleWatchGps() {
+    if (!('geolocation' in navigator)) {
+      setGpsError('Browser Geolocation API is unavailable.');
+      return;
+    }
+
+    if (isWatchingGps) {
+      if (watchIdRef.current !== null) {
+        navigator.geolocation.clearWatch(watchIdRef.current);
+        watchIdRef.current = null;
+      }
+      setIsWatchingGps(false);
+      showToast('Live GPS tracking paused.', 'info');
+      return;
+    }
+
+    setIsLocating(true);
+    setGpsError(null);
+    setIsWatchingGps(true);
+
+    watchIdRef.current = navigator.geolocation.watchPosition(
+      (pos) => {
+        setIsLocating(false);
+        const accuracy = Math.round(pos.coords.accuracy || 10);
+        resolveLiveCoordinate(
+          {
             lat: pos.coords.latitude,
             lng: pos.coords.longitude,
-            accuracy: Math.round(pos.coords.accuracy || 4)
-          };
-          setUserGpsCoords(coords);
-          showToast(`GPS Position Acquired: ${coords.lat.toFixed(4)}° N, ${coords.lng.toFixed(4)}° E`, 'info');
-        },
-        () => {
-          setIsLocating(false);
-          setUserGpsCoords({ lat: 12.336655, lng: 76.5677671, accuracy: 4 });
-          showToast(t('landing_gps_locked'), 'info');
-        },
-        { enableHighAccuracy: true, timeout: 5000 }
-      );
-    } else {
-      setIsLocating(false);
-      setUserGpsCoords({ lat: 12.336655, lng: 76.5677671, accuracy: 4 });
+            accuracyRadiusMeters: accuracy,
+            timestamp: Date.now(),
+            isSimulated: false
+          },
+          { openSheet: true, silentToast: true }
+        );
+      },
+      (err) => {
+        setIsLocating(false);
+        setIsWatchingGps(false);
+        if (watchIdRef.current !== null) {
+          navigator.geolocation.clearWatch(watchIdRef.current);
+          watchIdRef.current = null;
+        }
+        setGpsError(err?.message || 'Live GPS tracking failed.');
+        showToast('Live GPS tracking stopped due to location error.', 'error');
+      },
+      { enableHighAccuracy: true, maximumAge: 3000, timeout: 10000 }
+    );
+  }
+
+  function handleSimulateFieldGps(parcel = MOCK_LAND_PARCELS[0]) {
+    if (isWatchingGps && watchIdRef.current !== null && 'geolocation' in navigator) {
+      navigator.geolocation.clearWatch(watchIdRef.current);
+      watchIdRef.current = null;
+      setIsWatchingGps(false);
+    }
+    resolveLiveCoordinate({
+      lat: Number(parcel.coordinates.lat),
+      lng: Number(parcel.coordinates.lng),
+      accuracyRadiusMeters: parcel.coordinates.accuracyRadiusMeters || 4,
+      timestamp: Date.now(),
+      isSimulated: true
+    });
+  }
+
+  async function handleMapTapLocation({ lat, lng }) {
+    try {
+      const result = await landApiService.verifyCoordinates(lat, lng, 5, {
+        maxDistanceMeters: 500
+      });
+      setLocationMatch(result);
+      if (result.matchedParcel) {
+        setLocalSelectedParcel(result.matchedParcel);
+        setSelectedLand(result.matchedParcel);
+      }
+    } catch {
+      // Ignore transient map click failures
     }
   }
 
+  const readoutCoords = cursorCoords || userGpsCoords || viewportCenter;
+  const readoutUtm = useMemo(() => {
+    if (!readoutCoords || !Number.isFinite(Number(readoutCoords.lat))) return null;
+    return toUtm(Number(readoutCoords.lat), Number(readoutCoords.lng));
+  }, [readoutCoords]);
+
   return (
-    <div className="gmaps-viewport" onClick={() => isLangMenuOpen && setIsLangMenuOpen(false)}>
-      {/* 1. FULL-SCREEN BLANK CANVAS (Container ready for friend's live map integration) */}
-      <div id="live-map-container" className="gmaps-canvas live-map-blank">
-        {/* Blank viewport canvas reserved for live map mounting */}
+    <div className="gmaps-viewport">
+      {/* 1. FULL-SCREEN LIVE LEAFLET GIS CANVAS */}
+      <div id="live-map-container" className="gmaps-canvas">
+        <InteractiveCadastralMap
+          fullCanvas
+          parcels={matchingParcels}
+          selectedParcel={selectedParcel}
+          onSelectParcel={handleSelectParcel}
+          userCoordinates={userGpsCoords}
+          isLocating={isLocating}
+          externalLayer={mapMode}
+          externalZoom={zoomLevel}
+          externalFlyTarget={flyTarget}
+          onZoomChange={setZoomLevel}
+          onViewportChange={(vp) => {
+            if (vp && Number.isFinite(vp.lat) && Number.isFinite(vp.lng)) {
+              setViewportCenter({ lat: vp.lat, lng: vp.lng });
+            }
+          }}
+          onCursorChange={setCursorCoords}
+          onMapClickLocation={handleMapTapLocation}
+        />
       </div>
 
       {/* 2. GOOGLE MAPS FLOATING SEARCH CARD (TOP-LEFT) */}
@@ -121,7 +316,10 @@ export function LandingPage() {
             className="gmaps-search-input"
             placeholder={t('landing_search_placeholder')}
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={(e) => {
+              setSearchQuery(e.target.value);
+              setIsSearchFocused(true);
+            }}
             onFocus={() => setIsSearchFocused(true)}
           />
 
@@ -129,7 +327,10 @@ export function LandingPage() {
             <button
               type="button"
               className="gmaps-clear-btn"
-              onClick={() => setSearchQuery('')}
+              onClick={() => {
+                setSearchQuery('');
+                setIsSearchFocused(false);
+              }}
               aria-label="Clear Search"
             >
               &times;
@@ -138,7 +339,9 @@ export function LandingPage() {
             <button
               type="button"
               className="gmaps-search-submit-btn"
-              aria-label="Search"
+              onClick={handleLocateGps}
+              title="Fetch land info at my live device location"
+              aria-label="Fetch Live Location"
             >
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
                 <circle cx="11" cy="11" r="8"></circle>
@@ -180,8 +383,72 @@ export function LandingPage() {
           </button>
         </div>
 
+        {/* Live Device Location Action & Status Card */}
+        <div className="gmaps-live-gps-card">
+          <div className="live-gps-actions">
+            <button
+              type="button"
+              className="live-gps-fetch-btn"
+              onClick={handleLocateGps}
+              disabled={isLocating}
+            >
+              📍 {isLocating ? 'Acquiring GNSS...' : 'Fetch Land at Live Location'}
+            </button>
+            <button
+              type="button"
+              className={`live-gps-watch-btn ${isWatchingGps ? 'active' : ''}`}
+              onClick={handleToggleWatchGps}
+              title="Continuously track device GPS movement"
+            >
+              {isWatchingGps ? '● Tracking' : 'Live Track'}
+            </button>
+          </div>
+
+          {userGpsCoords && locationMatch && (
+            <div className={`live-gps-status status-${locationMatch.status.toLowerCase()}`}>
+              <div className="live-gps-coords-line">
+                <span>
+                  {userGpsCoords.isSimulated ? 'Simulated' : 'Device'} GNSS:{' '}
+                  <strong>
+                    {toDms(userGpsCoords.lat, 'lat')}, {toDms(userGpsCoords.lng, 'lng')}
+                  </strong>
+                </span>
+                <span className="gps-acc-pill">
+                  ±{userGpsCoords.accuracyRadiusMeters}m ({locationMatch.accuracyGrade})
+                </span>
+              </div>
+              <p className="live-gps-match-msg">{locationMatch.message}</p>
+            </div>
+          )}
+
+          {gpsError && (
+            <div className="live-gps-error-box">
+              <span>{gpsError}</span>
+              <button
+                type="button"
+                className="simulate-gps-btn"
+                onClick={() => handleSimulateFieldGps(MOCK_LAND_PARCELS[0])}
+              >
+                Simulate Field GPS (Mysuru 84/2A)
+              </button>
+            </div>
+          )}
+
+          {!gpsError && locationMatch?.status === 'OUTSIDE_COVERAGE' && (
+            <div className="live-gps-fallback-row">
+              <button
+                type="button"
+                className="simulate-gps-btn"
+                onClick={() => handleSimulateFieldGps(MOCK_LAND_PARCELS[0])}
+              >
+                Test Demo Parcel (Mysuru 84/2A)
+              </button>
+            </div>
+          )}
+        </div>
+
         {/* Search Results Dropdown List */}
-        {(isSearchFocused || searchQuery.trim()) && (
+        {isSearchFocused && (
           <div className="gmaps-search-results-dropdown">
             <div className="dropdown-header">
               <span>{matchingParcels.length} {t('landing_results_found')}</span>
@@ -289,6 +556,21 @@ export function LandingPage() {
                 <div className="row-text">
                   <span className="row-title">{t('landing_extent_label')}</span>
                   <span className="row-val">{selectedParcel.extent.formatted}</span>
+                </div>
+              </div>
+
+              <div className="sheet-row">
+                <span className="row-icon">🛰️</span>
+                <div className="row-text">
+                  <span className="row-title">WGS84 / UTM GIS Telemetry</span>
+                  <span className="row-val code-font">
+                    {selectedParcel.coordinates.lat.toFixed(5)}° N, {selectedParcel.coordinates.lng.toFixed(5)}° E
+                  </span>
+                  {selectedParcelSpatial && (
+                    <span className="row-title" style={{ marginTop: 2 }}>
+                      UTM {selectedParcelSpatial.utm.label} • Perimeter {formatDistance(selectedParcelSpatial.perimeter)}
+                    </span>
+                  )}
                 </div>
               </div>
 
@@ -467,10 +749,10 @@ export function LandingPage() {
         {/* Locate GPS Crosshair */}
         <button
           type="button"
-          className="gmaps-crosshair-btn"
+          className={`gmaps-crosshair-btn ${isWatchingGps ? 'tracking-active' : ''}`}
           onClick={handleLocateGps}
           disabled={isLocating}
-          title="Center on your live GPS location"
+          title="Center on your live GPS location & fetch parcel"
         >
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
             <circle cx="12" cy="12" r="10"></circle>
@@ -483,14 +765,16 @@ export function LandingPage() {
         </button>
       </div>
 
-      {/* 6. GOOGLE MAPS BOTTOM SCALE BAR & COORDINATES */}
+      {/* 6. GOOGLE MAPS BOTTOM SCALE BAR & LIVE COORDINATES */}
       <div className="gmaps-bottom-bar">
         <span className="gmaps-coord-readout">
-          12.336655° N, 76.567767° E • Zoom {zoomLevel}z • {t('landing_coord_suffix')}
+          {Number(readoutCoords.lat).toFixed(6)}° N, {Number(readoutCoords.lng).toFixed(6)}° E
+          {readoutUtm ? ` • UTM ${readoutUtm.zone}${readoutUtm.hemisphere}` : ''} • Zoom {zoomLevel}z •{' '}
+          {matchingParcels.length} Parcels • WGS84
         </span>
         <div className="gmaps-scale-meter">
           <span className="scale-bracket"></span>
-          <span className="scale-label">{t('landing_scale_label')}</span>
+          <span className="scale-label">{ZOOM_SCALE_LABELS[zoomLevel] || '500 m'}</span>
         </div>
       </div>
 
@@ -514,6 +798,7 @@ export function LandingPage() {
                 className="drawer-item"
                 onClick={() => {
                   setIsMenuOpen(false);
+                  if (!isAuthenticated) login({ email: DEMO_USER.email, password: 'ProjectGreen@2026' });
                   navigateTo('search');
                 }}
               >
@@ -536,6 +821,28 @@ export function LandingPage() {
 
               <div className="drawer-info-block">
                 <h5>{t('landing_drawer_portals')}</h5>
+                <h5>Simulate Field GNSS Location</h5>
+                <div className="drawer-sim-list">
+                  {MOCK_LAND_PARCELS.map((parcel) => (
+                    <button
+                      key={parcel.id}
+                      type="button"
+                      className="drawer-sim-btn"
+                      onClick={() => {
+                        setIsMenuOpen(false);
+                        handleSimulateFieldGps(parcel);
+                      }}
+                    >
+                      Survey {parcel.surveyNumber} • {parcel.village}, {parcel.district}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="drawer-divider" />
+
+              <div className="drawer-info-block">
+                <h5>Integrated Karnataka Portals</h5>
                 <ul>
                   <li>{t('landing_drawer_bhoomi')}</li>
                   <li>{t('landing_drawer_mojini')}</li>

@@ -1,13 +1,19 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useNavigation } from '../../context/NavigationContext';
 import { useLanguage } from '../../context/LanguageContext';
 import { VerificationCertificate } from '../../components/Certificate/VerificationCertificate';
+import { InteractiveCadastralMap } from '../../components/Map/InteractiveCadastralMap';
+import { describeParcel, formatDistance } from '../../gis/geo';
 import './LandDetails.css';
 
 export function LandDetails() {
   const { selectedLand, navigateTo, showToast } = useNavigation();
   const { t } = useLanguage();
   const [showCertificate, setShowCertificate] = useState(false);
+  const spatial = useMemo(
+    () => (selectedLand?.coordinates ? describeParcel(selectedLand) : null),
+    [selectedLand]
+  );
 
   if (!selectedLand) {
     return (
@@ -248,6 +254,23 @@ export function LandDetails() {
             </div>
             <div className="table-row">
               <span className="row-label">Elevation</span>
+              <span className="row-label">DMS (WGS84)</span>
+              <span className="row-value code-font">{spatial?.latDms}, {spatial?.lngDms}</span>
+            </div>
+            <div className="table-row">
+              <span className="row-label">UTM Zone {spatial?.utm.zone}{spatial?.utm.hemisphere}</span>
+              <span className="row-value code-font">{spatial?.utm.label}</span>
+            </div>
+            <div className="table-row">
+              <span className="row-label">Boundary Area (GIS)</span>
+              <span className="row-value">{spatial?.areaLabel}</span>
+            </div>
+            <div className="table-row">
+              <span className="row-label">Boundary Perimeter</span>
+              <span className="row-value">{spatial ? formatDistance(spatial.perimeter) : '—'}</span>
+            </div>
+            <div className="table-row">
+              <span className="row-label">Elevation Above Sea Level</span>
               <span className="row-value">{selectedLand.coordinates.elevation}</span>
             </div>
             <div className="table-row">
@@ -267,6 +290,22 @@ export function LandDetails() {
               <span className="row-value code-font">{selectedLand.mojiniSurveyRef}</span>
             </div>
           </div>
+        </div>
+
+        <div className="dossier-card dossier-map-span">
+          <div className="card-header-row">
+            <div className="card-icon-title">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
+              <h3>Survey Boundary Map</h3>
+            </div>
+            <span className="source-tag">Polygon scaled to RTC extent</span>
+          </div>
+          <InteractiveCadastralMap
+            compact
+            parcels={[selectedLand]}
+            selectedParcel={selectedLand}
+            onSelectParcel={() => {}}
+          />
         </div>
       </div>
 
