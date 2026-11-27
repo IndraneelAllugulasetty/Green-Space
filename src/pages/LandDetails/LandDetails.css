@@ -235,6 +235,10 @@
   gap: 24px;
 }
 
+.dossier-map-span {
+  grid-column: 1 / -1;
+}
+
 .dossier-card {
   background: #ffffff;
   border: 1px solid var(--color-border);

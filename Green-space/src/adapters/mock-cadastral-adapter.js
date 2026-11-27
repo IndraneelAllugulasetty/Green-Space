@@ -3,6 +3,7 @@
 // DISCLAIMER: Generates synthetic test records. Never claims to be official government data.
 
 const { DataSourceAdapter, SourceError } = require('./source-adapter');
+const { identifyParcelFromRecords } = require('../domain/spatial-lookup');
 
 class MockCadastralAdapter extends DataSourceAdapter {
   constructor(config = {}) {
@@ -119,6 +120,55 @@ class MockCadastralAdapter extends DataSourceAdapter {
         ]
       }
     });
+
+    this.seedParcel({
+      state: 'KARNATAKA',
+      district: 'MYSURU',
+      taluk: 'HUNSUR',
+      hobli: 'BILIKERE',
+      village: 'CHANNAPURA',
+      surveyNumber: '84',
+      hissa: '2A',
+      officialId: 'KA/BHOOMI/MY/HUN/2026/RTC-88124',
+      effectiveDate: '2026-11-18T04:00:00.000Z',
+      landDetails: {
+        totalAreaAcres: 3.35,
+        units: 'Acres-Guntas',
+        areaBreakup: '3 Acres 14 Guntas (approx. 1.35 Hectares)',
+        landClassification: 'Dry Agricultural (Kushki)',
+        soilType: 'Red Sandy Loam with fertile subsoil',
+        annualAssessmentInr: 58.0
+      },
+      owners: [
+        {
+          name: 'Hasnain Ahmed',
+          relation: 'Self / Ancestral Inheritance',
+          khataNumber: 'KH-8942/2018',
+          sharePercentage: 75.0,
+          acquisitionType: 'Ancestral Inheritance'
+        },
+        {
+          name: 'Fatima Begum',
+          relation: 'Co-sharer',
+          khataNumber: 'KH-8942/2018',
+          sharePercentage: 25.0,
+          acquisitionType: 'Co-sharer'
+        }
+      ],
+      liabilities: [],
+      geometry: {
+        type: 'Polygon',
+        coordinates: [
+          [
+            [76.6388, 12.2964],
+            [76.6400, 12.2964],
+            [76.6400, 12.2952],
+            [76.6388, 12.2952],
+            [76.6388, 12.2964]
+          ]
+        ]
+      }
+    });
   }
 
   seedParcel(item) {
@@ -220,6 +270,18 @@ class MockCadastralAdapter extends DataSourceAdapter {
       latencyMs: this.latencyMs,
       details: 'Mock sandbox operational'
     };
+  }
+
+  findByCoordinates({ lat, lng, accuracyMeters = null, maxDistanceMeters = 2000 }) {
+    const unique = new Map();
+    for (const item of this.simulatedParcels.values()) {
+      const id = item.officialId || `${item.state}:${item.district}:${item.taluk}:${item.village}:${item.surveyNumber}:${item.hissa || 'MAIN'}`;
+      if (!unique.has(id)) unique.set(id, item);
+    }
+    return identifyParcelFromRecords(
+      { lat, lng, accuracyMeters, maxDistanceMeters },
+      Array.from(unique.values())
+    );
   }
 }
 

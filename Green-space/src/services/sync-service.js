@@ -3,6 +3,7 @@
 
 const { FreshnessPolicy } = require('../domain/freshness');
 const ParcelIdentity = require('../domain/parcel-identity');
+const { identifyParcelFromRecords } = require('../domain/spatial-lookup');
 
 class SyncService {
   constructor({ parcelRepository, jobQueue, cacheService, defaultSourceId = 'MOCK_CADASTRAL_SANDBOX' }) {
@@ -134,6 +135,61 @@ async resolveParcel(query) {
       parcel: record.parcel,
       latestVersion: record.latestVersion,
       freshness
+    };
+  }
+
+  /**
+   * Resolves a parcel from live device WGS84 coordinates against persisted repository geometries.
+   */
+  async resolveByLocation({ lat, lng, accuracyMeters = null, maxDistanceMeters = 2000 }) {
+    const candidates = this.parcelRepo.listActiveParcelsWithGeometry();
+    const spatial = identifyParcelFromRecords(
+      { lat, lng, accuracyMeters, maxDistanceMeters },
+      candidates
+    );
+
+    if (spatial.status === 'INVALID_COORDINATES') {
+      return {
+        found: false,
+        status: spatial.status,
+        message: spatial.message,
+        validation: spatial.validation
+      };
+    }
+
+    if (!spatial.matched) {
+      return {
+        found: false,
+        status: spatial.status,
+        confidence: spatial.confidence,
+        message: spatial.message,
+        validation: spatial.validation,
+        nearestParcel: spatial.nearest || null,
+        distanceMeters: spatial.distanceMeters ?? null
+      };
+    }
+
+    const resolved = await this.resolveParcel({ parcelId: spatial.matched.id });
+    if (!resolved.found) {
+      return {
+        found: false,
+        status: 'NO_PARCEL_FOUND',
+        message: 'Matched parcel version is unavailable.'
+      };
+    }
+
+    return {
+      found: true,
+      status: spatial.status,
+      confidence: spatial.confidence,
+      insideBoundary: spatial.insideBoundary,
+      distanceMeters: spatial.distanceMeters,
+      message: spatial.message,
+      validation: spatial.validation,
+      parcel: resolved.parcel,
+      latestVersion: resolved.latestVersion,
+      freshness: resolved.freshness,
+      sourceOfData: resolved.sourceOfData
     };
   }
 

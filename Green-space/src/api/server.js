@@ -58,7 +58,8 @@ function createApp(options = {}) {
     syncService,
     parcelRepository: parcelRepo,
     jobQueue,
-    cacheService
+    cacheService,
+    adapterRegistry
   });
 
   const syncController = new SyncController({
@@ -85,6 +86,10 @@ function createApp(options = {}) {
   });
 
   // Routes
+  router.get('/api/v1/parcels', (req, res) => {
+    parcelController.listParcels(req, res);
+  });
+
   router.get('/api/v1/parcels/:parcelId', (req, res, params, url) => {
     parcelController.getParcel(req, res, params, url);
   });
@@ -107,6 +112,14 @@ function createApp(options = {}) {
 
   router.post('/api/v1/parcels/lookup', (req, res, params, url, body) => {
     parcelController.lookupOrCreate(req, res, params, url, body);
+  });
+
+  router.post('/api/v1/parcels/by-location', (req, res, params, url, body) => {
+    parcelController.lookupByLocation(req, res, params, url, body);
+  });
+
+  router.post('/api/v1/parcels/verify-location', (req, res, params, url, body) => {
+    parcelController.lookupByLocation(req, res, params, url, body);
   });
 
   // Static file handler for UI
