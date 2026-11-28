@@ -7,6 +7,7 @@ import { formatDistance, identifyParcelAtLocation, rankParcels, toDms } from '..
 import './PropertySearch.css';
 
 export function PropertySearch() {
+  console.log('PropertySearch rendered');
   const { navigateTo, selectedLand, setSelectedLand, showToast } = useNavigation();
   const { t } = useLanguage();
 
@@ -174,66 +175,60 @@ export function PropertySearch() {
   }
 
   return (
-    <div className="property-search-page">
-      {/* Search Header Banner */}
-      <div className="search-page-header">
-        <div>
-          <h1 className="search-title">{t('search_header_title')}</h1>
-          <p className="search-subtitle">
-            {t('search_header_sub')}
-          </p>
-        </div>
+  <div className="property-search-page">
+    {/* Search Header Banner */}
+    <div className="search-page-header">
+      <div>
+        <h1 className="search-title">
+          {t('search_header_title')}
+        </h1>
 
+        <p className="search-subtitle">
+          {t('search_header_sub')}
+        </p>
+      </div>
+
+      <div className="gps-header-actions">
         <button
           type="button"
           className="locate-gps-top-btn"
           onClick={handleCaptureGPS}
           disabled={isLocating}
-          title={t('search_btn_locate')}
+          title="Detect your live device coordinates and match parcel"
         >
-          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-            <circle cx="12" cy="12" r="10"/>
-            <circle cx="12" cy="12" r="4"/>
+          <svg
+            width="17"
+            height="17"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+          >
+            <circle cx="12" cy="12" r="10" />
+            <circle cx="12" cy="12" r="4" />
           </svg>
-          {isLocating ? t('search_btn_locating') : t('search_btn_locate')}
+          {isLocating ? 'Locating Position…' : 'Fetch by Live Location'}
         </button>
-            Fetch Karnataka Bhoomi land records directly from your device&apos;s live GNSS location, or search by Survey Number and administrative hierarchy.
-          </p>
-        </div>
 
-        <div className="gps-header-actions">
-          <button
-            type="button"
-            className="locate-gps-top-btn"
-            onClick={handleCaptureGPS}
-            disabled={isLocating}
-            title="Detect your live device coordinates and match parcel"
-          >
-            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-              <circle cx="12" cy="12" r="10" />
-              <circle cx="12" cy="12" r="4" />
-            </svg>
-            {isLocating ? 'Locating Position…' : 'Fetch by Live Location'}
-          </button>
+        <button
+          type="button"
+          className={`watch-gps-btn ${isWatchingGps ? 'active' : ''}`}
+          onClick={handleToggleWatchGPS}
+        >
+          {isWatchingGps ? '● Live Tracking ON' : 'Start Live Tracking'}
+        </button>
 
-          <button
-            type="button"
-            className={`watch-gps-btn ${isWatchingGps ? 'active' : ''}`}
-            onClick={handleToggleWatchGPS}
-          >
-            {isWatchingGps ? '● Live Tracking ON' : 'Start Live Tracking'}
-          </button>
-
-          <button
-            type="button"
-            className="simulate-field-btn"
-            onClick={handleSimulateMysuruFix}
-            title="Test spatial matching on Mysuru Survey No. 84/2A"
-          >
-            Simulate Field GPS
-          </button>
-        </div>
+        <button
+          type="button"
+          className="simulate-field-btn"
+          onClick={handleSimulateMysuruFix}
+          title="Test spatial matching on Mysuru Survey No. 84/2A"
+        >
+          Simulate Field GPS
+        </button>
       </div>
+    </div>
+
 
       {/* Split Layout: Search Box & List (Left) + Interactive Map (Right) */}
       <div className="search-split-layout">
@@ -329,17 +324,19 @@ export function PropertySearch() {
 
           {/* Results List */}
           <div className="search-results-container">
-            <div className="results-header-bar">
-              <span className="results-count">
-                <strong>{filteredParcels.length}</strong> {t('search_parcels_count')}
-              </span>
-              <span className="results-tip">✓ {t('search_verified_badge')}</span>
-                <strong>{visibleMatches.length}</strong> Land Parcels Found
-              </span>
-              <span className="results-tip">
-                {userCoordinates ? 'Sorted by distance from live GNSS fix' : 'Click a parcel to view on map'}
-              </span>
-            </div>
+            
+<div className="results-header-bar">
+  <span className="results-count">
+    <strong>{visibleMatches.length}</strong> Land Parcels Found
+  </span>
+
+  <span className="results-tip">
+    {userCoordinates
+      ? 'Sorted by distance from live GNSS fix'
+      : 'Click a parcel to view on map'}
+  </span>
+</div>
+
 
             <div className="results-list">
               {visibleMatches.length > 0 ? (
@@ -365,18 +362,23 @@ export function PropertySearch() {
                           {parcel.village}, {parcel.taluk}, {parcel.district}
                         </p>
 
-                        <div className="item-meta-row">
-                          <span className="item-owner">{t('common_owner')}: {parcel.ownerName}</span>
-                          <span className="item-class-tag">{parcel.landClassification.split(' ')[0]}</span>
-                          <span className="item-owner">Owner: {parcel.ownerName}</span>
-                          {distanceMeters !== null ? (
-                            <span className={`item-distance ${insideBoundary ? 'inside' : ''}`}>
-                              {insideBoundary ? 'Inside boundary' : formatDistance(distanceMeters)}
-                            </span>
-                          ) : (
-                            <span className="item-class-tag">{parcel.landClassification.split(' ')[0]}</span>
-                          )}
-                        </div>
+                        
+<div className="item-meta-row">
+  <span className="item-owner">
+    {t('common_owner')}: {parcel.ownerName}
+  </span>
+
+  <span className="item-class-tag">
+    {parcel.landClassification.split(' ')[0]}
+  </span>
+
+  {distanceMeters !== null && (
+    <span className={`item-distance ${insideBoundary ? 'inside' : ''}`}>
+      {insideBoundary ? 'Inside boundary' : formatDistance(distanceMeters)}
+    </span>
+  )}
+</div>
+
 
                         <div className="item-actions">
                           <button

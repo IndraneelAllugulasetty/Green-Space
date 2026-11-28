@@ -6,12 +6,13 @@ const NavigationContext = createContext(null);
 
 export function NavigationProvider({ children }) {
   const { isAuthenticated } = useAuth();
-  // Default to 'search' (Map view) if already logged in, otherwise 'landing'
-  const [currentView, setCurrentView] = useState(() => (isAuthenticated ? 'search' : 'landing'));
+  // Default view: landing for unauthenticated, otherwise search (handled by login)
+  const [currentView, setCurrentView] = useState('landing');
   const [selectedLand, setSelectedLand] = useState(MOCK_LAND_PARCELS[0]);
   const [toast, setToast] = useState(null);
 
   function navigateTo(view, data = null) {
+    console.log('Navigating to', view);
     if (data && view === 'land-details') {
       setSelectedLand(data);
     }
@@ -40,7 +41,7 @@ export function NavigationProvider({ children }) {
         setSelectedLand,
         toast,
         showToast,
-        clearToast
+        clearToast,
       }}
     >
       {children}
