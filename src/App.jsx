@@ -5,7 +5,7 @@ import { Navbar } from './components/Navbar/Navbar';
 import { Toast } from './components/Toast/Toast';
 import { LandingPage } from './pages/LandingPage/LandingPage';
 import { Login } from './pages/Login/Login';
-import { PropertySearch } from './pages/PropertySearch/PropertySearch';
+
 import { LandDetails } from './pages/LandDetails/LandDetails';
 import { PropertySale } from './pages/PropertySale/PropertySale';
 import './App.css';
@@ -26,7 +26,10 @@ function AppContent() {
     }
     return (
       <div className="app-wrapper">
-        <LandingPage />
+        <Navbar />
+        <main className="main-content-area" id="main-content">
+          <LandingPage />
+        </main>
         <Toast />
       </div>
     );
@@ -36,7 +39,10 @@ function AppContent() {
   if (currentView === 'landing') {
     return (
       <div className="app-wrapper">
-        <LandingPage />
+        <Navbar />
+        <main className="main-content-area" id="main-content">
+          <LandingPage />
+        </main>
         <Toast />
       </div>
     );
@@ -47,10 +53,10 @@ function AppContent() {
     <div className="app-wrapper">
       <Navbar />
       <main className="main-content-area" id="main-content">
-        {(currentView === 'search' || currentView === 'dashboard') && <PropertySearch />}
+
         {currentView === 'land-details' && <LandDetails />}
         {currentView === 'upload-sale' && <PropertySale />}
-        {currentView === 'login' && <PropertySearch />}
+
       </main>
       <Toast />
     </div>
